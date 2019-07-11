@@ -2,17 +2,6 @@
 
 How to evaluate and select features and models. Cross-validation, ROC curves, feature engineering, the role of regularization. Automated hyperparameter optimization.
 
-## Teaching Team
-
-| Position | Name  | Slack Handle | GHE Handle |
-| :------: | :---: | :----------: | :--------: |
-| Lecture instructor | Mark Schmidt | `@schmidtm` | `@schmidtm` |
-| Lab instructor | Varada Kolhatkar | `@Varada` | `@kvarada` |
-| Teaching assistant | Sunny Tseng	 | `@Sunny` | `@sunny541` |
-| Teaching assistant | Gursimran Singh | `@msimar` | `@msimar` |
-| Teaching assistant | Minzhi Liao | TBA | TBA |
-| Teaching assistant | Julian Ho | `@Julian` | `@hyhoaa` |
-
 ## Schedule
 
 Relevant textbooks: [AI:AMA](http://aima.cs.berkeley.edu), [ESL](https://web.stanford.edu/~hastie/ElemStatLearn), [ML:APP](http://www.cs.ubc.ca/~murphyk/MLbook/index.html), [LFD](http://amlbook.com/) 
@@ -31,23 +20,6 @@ Relevant textbooks: [AI:AMA](http://aima.cs.berkeley.edu), [ESL](https://web.sta
 | 8 | [MLE/MAP](lectures/S8.pdf?raw=1) | [Wikipedia](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) ML:APP 9.3-4  |
 | [Quiz 2 Practice Questions](quiz2_practice_questions.pdf) | L5-8 | |
 
-
-## Lab Assignments
-
-| #    | Lectures covered   | Due date |
-|-----|-------------|----------|
-| 1 | 1 & 2 & 3 | 2019-01-12 18:00
-| 2 | 4 & 5 | 2019-01-19 18:00
-| 3 | 6 & 7 | 2019-01-26 18:00
-| 4 | 8 | TBA
-
-
-## Quiz Schedule
-
-- Quiz 1 is happening during your third lab.
-- Quiz 2 is happening on TBA.
-
-Check the [official calendar](https://ubc-mds.github.io/calendar/) for details.
 
 ## Resources
 
