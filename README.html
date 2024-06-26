@@ -1,0 +1,835 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title> &#8212; DSCI 573 Feature and Model Selection</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'README';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Lecture 1: Classification metrics" href="lectures/01_classification-metrics.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="lectures/01_classification-metrics.html">Lecture 1: Classification metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/02_regression-metrics.html">Lecture 2: Regression metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/03_feature-engineering.html">Lecture 3: Feature engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/04_feat-importances-selection.html">Lecture 4: Feature importances and feature selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/05_loss-functions-regularization_intro.html">Lecture 5: Loss functions, intro to regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/06_L2-L1-regularization.html">Lecture 6: L2- and L1-Regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/07_ensembles.html">Lecture 7: Ensembles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lectures/08_model-transparency-conclusion.html">Lecture 8: Model transparency and conclusion</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-learning-outcomes">Course learning outcomes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deliverables">Deliverables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#teaching-team">Teaching team</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectures">Lectures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#format">Format</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-schedule">Lecture schedule</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#labs">Labs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-communication">Course communication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clarifications-on-the-lecture-notes-or-lab-questions">Clarifications on the lecture notes or lab questions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-on-lecture-material-or-labs">Questions on lecture material or labs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-related-to-grading">Questions related to grading</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-related-to-your-personal-situation-or-talking-about-sensitive-information">Questions related to your personal situation or talking about sensitive information</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-during-the-covid-19-global-pandemic">Working during the COVID-19 global pandemic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#covid-safety-at-ubc">Covid Safety at UBC</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-material">Reference Material</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#books">Books</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#online-courses">Online courses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#misc">Misc</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#policies">Policies</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h1>
+<p><img alt="" src="_images/573_banner.png" /></p>
+<p>In this course, we will cover evaluation metrics for classification and regression, feature engineering, feature selection, feature importances, ensembles, and regularization.</p>
+<section id="course-learning-outcomes">
+<h2>Course learning outcomes<a class="headerlink" href="#course-learning-outcomes" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<p>By the end of the course, students are expected to be able to</p>
+<ul class="simple">
+<li><p>build, debug, appropriately evaluate, and refine supervised machine learning models</p></li>
+<li><p>appropriate choose the right evaluation metric for classification and regression problems</p></li>
+<li><p>broadly describe and carry out preliminary feature engineering</p></li>
+<li><p>explain different feature selection methods and carry out feature selection</p></li>
+<li><p>interpret machine learning models in terms of feature importances</p></li>
+<li><p>explain and carry out L1- and L2-regularization</p></li>
+</ul>
+</details>
+</section>
+<section id="deliverables">
+<h2>Deliverables<a class="headerlink" href="#deliverables" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<p>The following deliverables will determine your course grade:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Assessment</p></th>
+<th class="head text-center"><p>Weight</p></th>
+<th class="head text-center"><p>Where to submit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>Lab Assignment 1</p></td>
+<td class="text-center"><p>15%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://www.gradescope.ca/courses/5685">Gradescope</a></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Lab Assignment 2</p></td>
+<td class="text-center"><p>15%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://www.gradescope.ca/courses/5685">Gradescope</a></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Lab Assignment 3</p></td>
+<td class="text-center"><p>15%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://www.gradescope.ca/courses/5685">Gradescope</a></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Lab Assignment 4</p></td>
+<td class="text-center"><p>15%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://www.gradescope.ca/courses/5685">Gradescope</a></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Quiz 1</p></td>
+<td class="text-center"><p>20%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://canvas.ubc.ca/courses/78168">Canvas</a></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Quiz 2</p></td>
+<td class="text-center"><p>20%</p></td>
+<td class="text-center"><p><a class="reference external" href="https://canvas.ubc.ca/courses/78168">Canvas</a></p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="https://ubc-mds.github.io/calendar/">Calendar</a> for the due dates.</p>
+</details>
+</section>
+<section id="teaching-team">
+<h2>Teaching team<a class="headerlink" href="#teaching-team" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Role</p></th>
+<th class="head text-center"><p>Name</p></th>
+<th class="head text-center"><p>Slack Handle</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>Lecture instructor</p></td>
+<td class="text-center"><p>Varada Kolhatkar</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">&#64;varada</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Lab instructor</p></td>
+<td class="text-center"><p>Joel Östblom</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">&#64;joel</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Ali Behrouz</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Ali</span> <span class="pre">Behrouz</span> <span class="pre">(TA)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Faeze Keshavarz</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Faeze</span> <span class="pre">Keshavarz</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Farnoosh Hashemi</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Farnoosh</span> <span class="pre">Hashemi</span> <span class="pre">(TA)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Harsh sharma</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Harsh</span> <span class="pre">(TA)</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Md Shahriar Rahim Siddiqui</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Shahriar</span> <span class="pre">(TA)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Mohit Pandey</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">(TA)</span> <span class="pre">Mohit</span> <span class="pre">Pandey</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>Teaching assistant</p></td>
+<td class="text-center"><p>Sana Ayromlou</p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">Sana</span> <span class="pre">(TA)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</details>  
+</section>
+<section id="lectures">
+<h2>Lectures<a class="headerlink" href="#lectures" title="Permalink to this heading">#</a></h2>
+<section id="format">
+<h3>Format<a class="headerlink" href="#format" title="Permalink to this heading">#</a></h3>
+<details>
+  <summary>Click to expand!</summary>
+<p>This course will be run in person. We will meet three times every week: twice for lectures and once for the lab. You can refer to the <a class="reference external" href="https://ubc-mds.github.io/calendar/">Calendar</a> for lecture and lab times and locations. Lectures of this course will be a combination of traditional live lecturing, a few pre-recorded videos, and class activities. The night before each lecture, the material will be made available to you.
+It’s optional but highly recommended to download the appropriate datasets provided below and put them under your local <code class="docutils literal notranslate"><span class="pre">lectures/data</span></code> directory, and run the lecture Jupyter notebooks on your own and experiment with the code.</p>
+</details>
+</section>
+<section id="lecture-schedule">
+<h3>Lecture schedule<a class="headerlink" href="#lecture-schedule" title="Permalink to this heading">#</a></h3>
+<p>This course occurs during <strong>Block 3</strong> in the 2022/23 school year.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Lecture</p></th>
+<th class="head"><p>Topic</p></th>
+<th class="head"><p>Assigned videos</p></th>
+<th class="head"><p>Resources and optional readings</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><a class="reference internal" href="lectures/01_classification-metrics.html"><span class="doc std std-doc">Evaluation metrics for classification, class imbalance</span></a></p></td>
+<td><p>📹  <li> post-lecture: <a class="reference external" href="https://youtu.be/jHaKRCFb6Qw">9.4</a></li></p></td>
+<td><p><li><a class="reference external" href="https://github.com/dariyasydykova/open_projects/tree/master/ROC_animation">ROC animation</a></li></p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><a class="reference internal" href="lectures/02_regression-metrics.html"><span class="doc std std-doc">Evaluation metrics for regression</span></a></p></td>
+<td><p>📹  <li>pre-lecture: <a class="reference external" href="https://youtu.be/lgGTKLwNgkQ">10.1</a></li></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><a class="reference internal" href="lectures/03_feature-engineering.html"><span class="doc std std-doc">Feature engineering</span></a></p></td>
+<td><p>None</p></td>
+<td><p><li><a class="reference external" href="https://github.com/explosion/spaCy">spaCy</a></li><li><a class="reference external" href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36955.pdf">The Learning Behind Gmail Priority Inbox</a></li><li><a class="reference external" href="https://books.google.com/ngrams">Google n-gram viewer</a></li></p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><a class="reference internal" href="lectures/04_feat-importances-selection.html"><span class="doc std std-doc">Feature importances and selection</span></a></p></td>
+<td><p>None</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><a class="reference internal" href="lectures/05_loss-functions-regularization_intro.html"><span class="doc std std-doc">Loss functions and regularization</span></a></p></td>
+<td><p>None</p></td>
+<td><p><li><a class="reference external" href="https://www.youtube.com/watch?v=OqakHTDV3iI&amp;feature=youtu.be&amp;t=2812">Mike’s video on loss functions</a></li></p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><a class="reference internal" href="lectures/06_L2-L1-regularization.html"><span class="doc std std-doc">More regularization</span></a></p></td>
+<td><p>None</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p><a class="reference internal" href="lectures/07_ensembles.html"><span class="doc std std-doc">Ensembles</span></a></p></td>
+<td><p>📹 <li><a class="reference external" href="https://youtu.be/8litm1H7DLo">11.1</a></li></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p><a class="reference internal" href="lectures/08_model-transparency-conclusion.html"><span class="doc std std-doc">Model interpretability and SHAP</span></a></p></td>
+<td><p>📹 <li><a class="reference external" href="https://youtu.be/xfICsGL7DXE">12.1</a></li></p></td>
+<td><p><li><a class="reference external" href="https://github.com/slundberg/shap">SHAP</a></li><li><a class="reference external" href="https://christophm.github.io/interpretable-ml-book/">Interpretable Machine Learning</a></li></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="datasets">
+<h3>Datasets<a class="headerlink" href="#datasets" title="Permalink to this heading">#</a></h3>
+<p>Here is the list of <a class="reference external" href="https://www.kaggle.com/">Kaggle</a> datasets we’ll use in this class.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.kaggle.com/mlg-ulb/creditcardfraud">Credit Card Fraud Detection</a></p></li>
+<li><p><a class="reference external" href="https://www.kaggle.com/c/home-data-for-ml-course/">Housing Prices dataset</a></p></li>
+<li><p>(Optional) <a class="reference external" href="http://marsyas.info/downloads/datasets.html">MARSYAS</a></p></li>
+<li><p><a class="reference external" href="https://www.kaggle.com/uciml/adult-census-income#">The adult census dataset</a></p></li>
+<li><p><a class="reference external" href="https://www.kaggle.com/geomack/spotifyclassification/home">Spotify Song Attributes</a></p></li>
+</ul>
+<p>If you want to be extra prepared, you may want to download these datasets in advance and save them under the <code class="docutils literal notranslate"><span class="pre">lectures/data</span></code> directory in your local copy of the repository.</p>
+</section>
+</section>
+<section id="labs">
+<h2>Labs<a class="headerlink" href="#labs" title="Permalink to this heading">#</a></h2>
+<p>During labs, you will be given time to work on your own or in groups. There will be a lot of opportunity for discussion and getting help during lab sessions. (Usually I enjoy labs a lot. It’s also an opportunity for me to know you a bit better 🙂.)</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
+<p>We are providing you with a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment file which is available <a class="reference download internal" download="" href="_downloads/935a2979b06de218cf33eb76872708f7/env-dsci-573.yaml"><span class="xref download myst">here</span></a>.</p>
+<p>In order to get ready for the course, we suggest that you:</p>
+<ol class="arabic">
+<li><p>clone the course repository</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">ubc</span><span class="o">.</span><span class="n">ca</span><span class="p">:</span><span class="n">MDS</span><span class="o">-</span><span class="mi">2022</span><span class="o">-</span><span class="mi">23</span><span class="o">/</span><span class="n">DSCI_573_feat</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">select_students</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">ubc</span><span class="o">.</span><span class="n">ca</span><span class="o">/</span><span class="n">MDS</span><span class="o">-</span><span class="mi">2022</span><span class="o">-</span><span class="mi">23</span><span class="o">/</span><span class="n">DSCI_573_feat</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">select_students</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+<li><p>navigate to the repository</p>
+<p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">DSCI_573_feat-model-select_students</span></code></p>
+</li>
+<li><p>create the environment</p>
+<p><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">env-dsci-573.yaml</span></code></p>
+</li>
+</ol>
+<p>Assuming that your environment was created successfully, you can activate it using:<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">573</span></code></p>
+<p>In order to use this environment in <code class="docutils literal notranslate"><span class="pre">Jupyter</span></code>, you will have to install <code class="docutils literal notranslate"><span class="pre">nb_conda_kernels</span></code> in the environment where you have installed <code class="docutils literal notranslate"><span class="pre">Jupyter</span></code> (typically the <code class="docutils literal notranslate"><span class="pre">base</span></code> environment):
+<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">nb_conda_kernels</span>&#160;&#160;&#160; </code></p>
+<p>You will then be able to select this new environment in <code class="docutils literal notranslate"><span class="pre">Jupyter</span></code>. (<code class="docutils literal notranslate"><span class="pre">ipykernel</span></code> is in our course environment). For more details on this, refer to “Making environments work well with JupyterLab section” in your <a class="reference external" href="https://pages.github.ubc.ca/fdandrea/521_lecture6/slides.html#51">521 lecture 6</a>.</p>
+<p>I’ve only tried installing this environment file on a couple of machines, and it’s possible that you will encounter problems with some of the packages from the <code class="docutils literal notranslate"><span class="pre">yaml</span></code> file when you run the commands above. This is not unusual. It often means that the package with the given version is not available for your operating system via <code class="docutils literal notranslate"><span class="pre">conda</span></code> yet. There are a couple of options for you when this happens:</p>
+<ol class="arabic simple">
+<li><p>Get rid of the line with that package from the <code class="docutils literal notranslate"><span class="pre">yaml</span></code> file.</p></li>
+<li><p>Create the environment without that package.</p></li>
+<li><p>Activate the environment and install the package manually either with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span></code> or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> in the environment.</p></li>
+</ol>
+<p><em>Note that this is not a complete list of the packages we’ll be using in the course and there might be a few packages you will be installing using <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span></code> later in the course. But this is a good enough list to get you started.</em></p>
+</section>
+<section id="course-communication">
+<h2>Course communication<a class="headerlink" href="#course-communication" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<p>We all are here to help you learn and succeed in the course and the program. Here is how we’ll be communicating with each other during the course.</p>
+<section id="clarifications-on-the-lecture-notes-or-lab-questions">
+<h3>Clarifications on the lecture notes or lab questions<a class="headerlink" href="#clarifications-on-the-lecture-notes-or-lab-questions" title="Permalink to this heading">#</a></h3>
+<p>If there is any clarification on the lecture material or lab questions, I’ll open an issue in the <a class="reference external" href="https://github.ubc.ca/MDS-2021-22/DSCI_571_sup-learn-1_students">course repository</a> and tag you. <strong>It is your responsibility to read the messages whenever you are tagged.</strong> (I know that there are too many things for you to keep track of. You do not have to read all the messages but please make sure to carefully read the messages whenever you are tagged.)</p>
+</section>
+<section id="questions-on-lecture-material-or-labs">
+<h3>Questions on lecture material or labs<a class="headerlink" href="#questions-on-lecture-material-or-labs" title="Permalink to this heading">#</a></h3>
+<p>If you have questions about the lecture material or lab questions please post them on the course Slack channel rather than direct messaging me or the TAs. Here are the advantages of doing so:</p>
+<ul class="simple">
+<li><p>You’ll get a quicker response.</p></li>
+<li><p>Your classmates will benefit from the discussion.</p></li>
+</ul>
+<p>When you ask your question on the course channel, please avoid tagging the instructor unless it’s specific for the instructor (e.g., if you notice some mistake in the lecture notes). If you tag a specific person, other teaching team members or your colleagues are discouraged to respond. This is decrease the response rate on the channel.</p>
+<p>Please use some consistent convention when you ask questions on Slack to facilitate easy search for others or future you. For example, if you want to ask a question on Exercise 3.2 from Lab 1, start your post with the label <code class="docutils literal notranslate"><span class="pre">lab1-ex2.3</span></code>. Or if you have a question on lecture 2 material, start your post with the label <code class="docutils literal notranslate"><span class="pre">lecture2</span></code>. Once the question is answered/solved, you can add “(solved)” tag before the label (e.g., (solved) <code class="docutils literal notranslate"><span class="pre">lab1-ex2.3</span></code>. Do not delete your post even if you figure out the answer on your own. The question and the discussion can still be beneficial to others.</p>
+</section>
+<section id="questions-related-to-grading">
+<h3>Questions related to grading<a class="headerlink" href="#questions-related-to-grading" title="Permalink to this heading">#</a></h3>
+<p>For each deliverable, after I return grades, I’ll let you know who has graded what in our course Slack by opening an issue in the course GitHub repository. If you have questions related to grading</p>
+<ul class="simple">
+<li><p>First, make sure your concerns are reasonable (read the <a class="reference external" href="https://ubc-mds.github.io/policies/">“Reasonable grading concerns” policy</a>).</p></li>
+<li><p>If you believe that your request is reasonable, open a regrade request on Gradescope.</p></li>
+<li><p>If you are unable to resolve the issue with the TA, send a Slack message to the instructor, including the appropriate TA in the conversation.</p></li>
+</ul>
+</section>
+<section id="questions-related-to-your-personal-situation-or-talking-about-sensitive-information">
+<h3>Questions related to your personal situation or talking about sensitive information<a class="headerlink" href="#questions-related-to-your-personal-situation-or-talking-about-sensitive-information" title="Permalink to this heading">#</a></h3>
+<p>I am open for a conversation with you. If you want to talk about anything sensitive, please direct message me on Slack (and tag me) rather than posting it on the course channel. It might take a while for me to get back to you, but I’ll try my best to respond as soon as possible.</p>
+</details>
+</section>
+</section>
+<section id="working-during-the-covid-19-global-pandemic">
+<h2>Working during the COVID-19 global pandemic<a class="headerlink" href="#working-during-the-covid-19-global-pandemic" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<p>We are working together on this course during this transition period between hybrid to in-person teaching and learning. Everyone is struggling to some extent. If you tell me you are having trouble, I am not going to judge you or think less of you. I hope you will extend me the same grace! Let’s try to be open with each other and help each other.</p>
+<p>Here are some ground rules:</p>
+<ul class="simple">
+<li><p>If you are unable to submit a deliverable on time, please reach out <strong>before</strong> the deliverable is due.</p></li>
+<li><p>If you need extra support, the teaching team is here to work with you. Our goal is to help each of you succeed in the course.</p></li>
+<li><p>If you are struggling with the material, getting back to in-person teaching and learning, or anything else, please reach out. I will try to find time and listen to you empathetically.</p></li>
+<li><p>If I am unable to help you, I might know someone who can. UBC has some <a class="reference external" href="https://students.ubc.ca/support">great student support resources</a>.</p></li>
+</ul>
+<section id="covid-safety-at-ubc">
+<h3><a class="reference external" href="https://srs.ubc.ca/covid-19/ubc-campus-rules-guidance-documents/#COVID-19%20Campus%20Rules">Covid Safety at UBC</a><a class="headerlink" href="#covid-safety-at-ubc" title="Permalink to this heading">#</a></h3>
+<p>Please read <a class="reference external" href="https://srs.ubc.ca/covid-19/ubc-campus-rules-guidance-documents/#COVID-19%20Campus%20Rules">Covid Campus Rules</a>.</p>
+<p><strong>Masks:</strong> This class is going to be in person. UBC no longer requires students, faculty and staff to wear non-medical masks, but continues to recommend that masks be worn in indoor public spaces.</p>
+<p><strong>Your personal health:</strong>
+If you are ill or believe you have COVID-19 symptoms or been exposed to SARS-CoV-2 use the <a class="reference external" href="https://bc.thrive.health/covid19/en">Thrive Health</a> self-assessment tool for guidance, or download the <a class="reference external" href="https://welcome.thrive.health/bc-covid19-app">BC COVID-19 Support App</a> for iOS or Android device and follow the instructions provided. Follow the advice from <a class="reference external" href="https://www2.gov.bc.ca/gov/content/covid-19/info/restrictions">Public Health</a>.</p>
+<p>Stay home if you have recently tested positive for COVID-19 or are required to quarantine. You can check <a class="reference external" href="http://www.bccdc.ca/health-info/diseases-conditions/covid-19/self-isolation#Who">this website</a> to find out if you should self-isolate or self-monitor. If you are unable to submit a deliverable on time or unable to appear for an in-person quiz, check out <a class="reference external" href="https://ubc-mds.github.io/policies/">MDS policies</a> on academic concession and remote quiz requests.</p>
+<p>Your precautions will help reduce risk and keep everyone safer. In this class, the marking scheme is intended to provide flexibility so that you can prioritize your health and still be able to succeed:</p>
+<ul class="simple">
+<li><p>All course notes will be provided online.</p></li>
+<li><p>All homework assignments can be done and handed in online.</p></li>
+<li><p>All exams will be held online.</p></li>
+<li><p>Most of the class activity will be video recorded and will be made available to you.</p></li>
+<li><p>Before each class, I’ll also try to post some <a class="reference external" href="https://www.youtube.com/watch?v=-1hTcS5ZE4w&amp;list=PLHofvQE1VlGtZoAULxcHb7lOsMved0CuM">videos on YouTube</a> to facilitate hybrid learning.</p></li>
+<li><p>There will be at least a few office hours which will be held online.</p></li>
+</ul>
+</details>
+</section>
+</section>
+<section id="reference-material">
+<h2>Reference Material<a class="headerlink" href="#reference-material" title="Permalink to this heading">#</a></h2>
+<details>
+  <summary>Click to expand!</summary>
+<section id="books">
+<h3>Books<a class="headerlink" href="#books" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://ciml.info/">A Course in Machine Learning (CIML)</a> by Hal Daumé III (also relevant for DSCI 572, 573, 575, 563)</p></li>
+<li><p>Introduction to Machine Learning with Python: A Guide for Data Scientists by Andreas C. Mueller and Sarah Guido.</p></li>
+<li><p><a class="reference external" href="https://hastie.su.domains/ISLR2/ISLRv2_website.pdf">An Introduction to Statistical
+Learning</a></p></li>
+<li><p><a class="reference external" href="https://web.stanford.edu/~hastie/Papers/ESLII.pdf">The Elements of Statistical Learning (ESL)</a></p></li>
+<li><p><a class="reference external" href="https://www.wi.hs-wismar.de/~cleve/vorl/projects/dm/ss13/HierarClustern/Literatur/WittenFrank-DM-3rd.pdf">Data Mining: Practical Machine Learning Tools and Techniques (PMLTT)</a></p></li>
+<li><p>Artificial intelligence: A Modern Approach by Russell, Stuart and Peter Norvig.</p></li>
+<li><p><a class="reference external" href="https://artint.info/2e/html/ArtInt2e.htm">Artificial Intelligence 2E: Foundations of Computational Agents</a> (2017) by David Poole and Alan Mackworth (of UBC!).</p></li>
+</ul>
+</section>
+<section id="online-courses">
+<h3>Online courses<a class="headerlink" href="#online-courses" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/UBC-CS/cpsc330">CPSC 330</a><br>
+I’m currently teaching an undergrad course on applied machine learning. Unlike DSCI 571, CPSC 330 is a semester-long course but there is a lot of overlap and sharing of notes between these courses.</p></li>
+<li><p><a class="reference external" href="https://ubc-cs.github.io/cpsc340/">Mike’s CPSC 340</a></p></li>
+<li><p><a class="reference external" href="https://www.coursera.org/learn/machine-learning">Machine Learning</a> (Andrew Ng’s famous Coursera course)</p></li>
+<li><p><a class="reference external" href="https://bloomberg.github.io/foml/#home">Foundations of Machine Learning</a> online course from Bloomberg.</p></li>
+<li><p><a class="reference external" href="http://www.johnwittenauer.net/machine-learning-exercises-in-python-part-1/">Machine Learning Exercises In Python, Part 1</a> (translation of Andrew Ng’s course to Python, also relevant for DSCI 561, 572, 563)</p></li>
+</ul>
+</section>
+<section id="misc">
+<h3>Misc<a class="headerlink" href="#misc" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/">A Visual Introduction to Machine Learning (Part 1)</a></p></li>
+<li><p><a class="reference external" href="https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf">A Few Useful Things to Know About Machine Learning</a> (an article by Pedro Domingos)</p></li>
+<li><p><a class="reference external" href="https://metacademy.org/">Metacademy</a> (sort of like a concept map for machine learning, with suggested resources)</p></li>
+<li><p><a class="reference external" href="https://docs.google.com/presentation/d/1kSuQyW5DTnkVaZEjGYCkfOxvzCqGEFzWBy4e9Uedd9k/present?slide=id.g168a3288f7_0_58">Machine Learning
+101</a>
+(slides by Jason Mayes, engineer at Google)</p></li>
+</ul>
+</details>     
+</section>
+</section>
+<section id="policies">
+<h2>Policies<a class="headerlink" href="#policies" title="Permalink to this heading">#</a></h2>
+<p>Please see the general <a class="reference external" href="https://ubc-mds.github.io/policies/">MDS policies</a>.</p>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="right-next"
+       href="lectures/01_classification-metrics.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lecture 1: Classification metrics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-learning-outcomes">Course learning outcomes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deliverables">Deliverables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#teaching-team">Teaching team</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lectures">Lectures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#format">Format</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-schedule">Lecture schedule</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#labs">Labs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-communication">Course communication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clarifications-on-the-lecture-notes-or-lab-questions">Clarifications on the lecture notes or lab questions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-on-lecture-material-or-labs">Questions on lecture material or labs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-related-to-grading">Questions related to grading</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-related-to-your-personal-situation-or-talking-about-sensitive-information">Questions related to your personal situation or talking about sensitive information</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-during-the-covid-19-global-pandemic">Working during the COVID-19 global pandemic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#covid-safety-at-ubc">Covid Safety at UBC</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-material">Reference Material</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#books">Books</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#online-courses">Online courses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#misc">Misc</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#policies">Policies</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar and Joel Östblom
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

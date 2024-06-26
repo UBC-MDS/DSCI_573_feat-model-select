@@ -1,0 +1,1759 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>DSCI 573: Feature and Model Selection &#8212; DSCI 573 Feature and Model Selection</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_lectures/08_lecture-logistic-regression';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01_classification-metrics.html">Lecture 1: Classification metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02_regression-metrics.html">Lecture 2: Regression metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03_feature-engineering.html">Lecture 3: Feature engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04_feat-importances-selection.html">Lecture 4: Feature importances and feature selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05_loss-functions-regularization_intro.html">Lecture 5: Loss functions, intro to regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06_L2-L1-regularization.html">Lecture 6: L2- and L1-Regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07_ensembles.html">Lecture 7: Ensembles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08_model-transparency-conclusion.html">Lecture 8: Model transparency and conclusion</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_lectures/08_lecture-logistic-regression.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>DSCI 573: Feature and Model Selection</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-8-more-about-logistic-regression">Lecture 8: More about Logistic Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-regression-predict">1. Logistic regression: <code class="docutils literal notranslate"><span class="pre">predict</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-of-ones-trick">“column of ones” trick</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-of-ones-trick-example">“column of ones” trick: example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vectorization">Vectorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scores-to-probabilities">Scores to probabilities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-sigmoid-function">The sigmoid function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-boundary-of-logistic-regression">Decision boundary of logistic regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prediction-with-learned-weights">Prediction with learned weights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-probabilities">Predicting probabilities</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-regression-fit">Logistic regression: <code class="docutils literal notranslate"><span class="pre">fit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#goal">Goal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-loss-function">Least squares loss function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-for-logistic-regression">Least squares for logistic regression?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-not-least-squares-loss-for-logistic-regression">Why not least squares loss for logistic regression?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#want">Want</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-idea">Key idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss">Logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss-intuition">Logistic loss: intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sigmoid-vs-logistic-loss">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hinge-loss-optional">Hinge loss (optional)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#let-s-implement-logistic-loss-function">Let’s implement logistic loss function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-source-of-confusion">Another source of confusion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-difference-between-them">The key difference between them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#let-s-define-our-loss-functions">Let’s define our loss functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-vs-loss">Error vs. loss</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax">Softmax</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax-function">Softmax function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logisticregression-with-multi-class-multinomial"><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class="multinomial"</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class="multinomial"</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-final-remarks">Summary and final remarks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-course">Summary of the course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-of-ml-courses-in-mds">Map of ML courses in MDS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coming-up">Coming up …</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-remarks">Final remarks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#true-false-questions-for-class-discussion-videos-1-and-2">True/False questions for class discussion (Videos 1 and 2)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#true-false-questions-for-class-discussion-videos-3-and-4">True/False questions for class discussion (Videos 3 and 4)</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="dsci-573-feature-and-model-selection">
+<h1>DSCI 573: Feature and Model Selection<a class="headerlink" href="#dsci-573-feature-and-model-selection" title="Permalink to this heading">#</a></h1>
+<section id="lecture-8-more-about-logistic-regression">
+<h2>Lecture 8: More about Logistic Regression<a class="headerlink" href="#lecture-8-more-about-logistic-regression" title="Permalink to this heading">#</a></h2>
+<p>UBC Master of Data Science program, 2020-21</p>
+<p>Instructor: Varada Kolhatkar</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">npr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># other</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">log_loss</span><span class="p">,</span> <span class="n">make_scorer</span><span class="p">,</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cross_val_score</span><span class="p">,</span>
+    <span class="n">cross_validate</span><span class="p">,</span>
+    <span class="n">train_test_split</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_colwidth&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="c1"># pip install git+git://github.com/mgelbart/plot-classifier.git</span>
+<span class="kn">from</span> <span class="nn">plot_classifier</span> <span class="kn">import</span> <span class="n">plot_classifier</span><span class="p">,</span> <span class="n">plot_loss_diagram</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="learning-outcomes">
+<h3>Learning outcomes<a class="headerlink" href="#learning-outcomes" title="Permalink to this heading">#</a></h3>
+<p>From this lecture, students are expected to be able to:</p>
+<ul class="simple">
+<li><p>Explain the “column of ones” trick.</p></li>
+<li><p>Explain vectorization in logistic regression.</p></li>
+<li><p>Explain the intuition behind logistic loss.</p></li>
+<li><p>Explain the difference between sigmoid and logistic loss.</p></li>
+<li><p>Implement logistic loss.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">log_loss</span></code> function.</p></li>
+<li><p>Explain the difference between loss and error.</p></li>
+<li><p>Explain and implement softmax function.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">multi_class=&quot;multinomial&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> for multi-class classification.</p></li>
+</ul>
+</section>
+</section>
+<section id="logistic-regression-predict">
+<h2>1. Logistic regression: <code class="docutils literal notranslate"><span class="pre">predict</span></code><a class="headerlink" href="#logistic-regression-predict" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Video 1</p></li>
+</ul>
+<ul class="simple">
+<li><p>It is a classification algorithm. Since it’s linear and a classifier, we call it a linear classifier.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Recall that logistic regression learns the weights <span class="math notranslate nohighlight">\(w\)</span> and bias or intercept <span class="math notranslate nohighlight">\(b\)</span></p></li>
+<li><p>There’s one coefficient per feature, plus an intercept, just like linear regression.</p></li>
+<li><p>We combine our features and coefficients with a dot product:</p></li>
+</ul>
+<div class="amsmath math notranslate nohighlight" id="equation-be8d00a9-9130-4aa8-bb87-5a7d082f7305">
+<span class="eqno">()<a class="headerlink" href="#equation-be8d00a9-9130-4aa8-bb87-5a7d082f7305" title="Permalink to this equation">#</a></span>\[\begin{equation}
+\begin{split}
+z =&amp; w_1x_1 + \dots w_dx_d + b\\
+=&amp; w^Tx + b
+\end{split}
+\end{equation}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> 
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;x:&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;w:&#39;</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x: [ 0.77822721  0.43548783 -0.70491797  0.0413766  -0.84906356]
+w: [ 0.70065258  0.66882859  0.59905631  0.51125365 -0.87355653]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;w^T.x: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>w^T.x:  1.1771070085710456
+</pre></div>
+</div>
+</div>
+</div>
+<section id="column-of-ones-trick">
+<h3>“column of ones” trick<a class="headerlink" href="#column-of-ones-trick" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We’ll often ignore the intercept <span class="math notranslate nohighlight">\(b\)</span> because of the “column of ones” trick.</p></li>
+<li><p>For simplicity, we rename bias term as <span class="math notranslate nohighlight">\(w_0\)</span> and introduce a dummy feature <span class="math notranslate nohighlight">\(x_0\)</span> whose value is always 1.</p></li>
+<li><p>So <span class="math notranslate nohighlight">\(w_1x_1 + \dots + w_nx_n + b\)</span> becomes <span class="math notranslate nohighlight">\(w_0x_0 + w_1x_1 + \dots + w_nx_n\)</span>, where <span class="math notranslate nohighlight">\(x_0\)</span> is always 1.</p></li>
+</ul>
+</section>
+<section id="column-of-ones-trick-example">
+<h3>“column of ones” trick: example<a class="headerlink" href="#column-of-ones-trick-example" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Suppose <span class="math notranslate nohighlight">\(X\)</span> has only one feature, say <span class="math notranslate nohighlight">\(x_1\)</span>:
+$<span class="math notranslate nohighlight">\(X = \begin{bmatrix}0.86 \\ 0.02 \\ -0.42 \end{bmatrix}\)</span>$</p></li>
+<li><p>Make a new matrix <span class="math notranslate nohighlight">\(Z\)</span> with an extra feature (say <span class="math notranslate nohighlight">\(x_0\)</span>) whose value is always 1.
+$<span class="math notranslate nohighlight">\(Z = \begin{bmatrix}1 &amp; 0.86\\ 1 &amp; 0.02 \\ 1 &amp; -0.42\\ \end{bmatrix}\)</span>$</p></li>
+<li><p>Use <span class="math notranslate nohighlight">\(Z\)</span> instead of <span class="math notranslate nohighlight">\(X\)</span>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">d</span><span class="p">])</span>
+<span class="n">X</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 0.5060273 ,  0.42174358, -0.43451624, -0.3821009 , -0.96547577],
+       [-0.19443369,  0.94406096, -0.6897764 , -0.22245692,  0.63942998],
+       [ 0.56814134,  0.75783539, -0.55455206,  0.17784076, -0.34708951],
+       [ 0.4983871 ,  0.41544464,  0.12728545, -0.5230312 , -0.00424926]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s add a column of ones to create <code class="docutils literal notranslate"><span class="pre">Z</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">Z</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">X</span>
+<span class="n">Z</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1.        ,  0.5060273 ,  0.42174358, -0.43451624, -0.3821009 ,
+        -0.96547577],
+       [ 1.        , -0.19443369,  0.94406096, -0.6897764 , -0.22245692,
+         0.63942998],
+       [ 1.        ,  0.56814134,  0.75783539, -0.55455206,  0.17784076,
+        -0.34708951],
+       [ 1.        ,  0.4983871 ,  0.41544464,  0.12728545, -0.5230312 ,
+        -0.00424926]])
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Suppose <span class="math notranslate nohighlight">\(w\)</span> are our learned parameters.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> 
+<span class="n">w</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.52480423, -0.41598735,  0.06382638, -0.79729799,  0.8001295 ,
+        0.01362316])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vectorization">
+<h3>Vectorization<a class="headerlink" href="#vectorization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We can organize all the training examples into a matrix <span class="math notranslate nohighlight">\(Z\)</span> with one row per training example.</p></li>
+<li><p>Then compute the predictions for the whole dataset succinctly as <span class="math notranslate nohighlight">\(Zw\)</span> for the whole dataset:</p></li>
+<li><p>We take each row of <span class="math notranslate nohighlight">\(Z\)</span> and dot-product it with <span class="math notranslate nohighlight">\(w\)</span>. So the result is a vector of all our predictions.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}Zw = \begin{bmatrix}w^Tz_0 \\ w^Tz_1 \\ \vdots \\ w^Tz_n\end{bmatrix} = \begin{bmatrix}z_0w \\ z_1w \\ \vdots \\ z_nw\end{bmatrix} = \begin{bmatrix} \hat{y_1} \\ \hat{y_2} \\ \vdots \\ \hat{y_n}\end{bmatrix} \end{split}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span> <span class="o">=</span> <span class="n">Z</span><span class="nd">@w</span>
+<span class="n">y_hat</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.36877753,  1.04661623,  0.91654494, -0.17603719,  1.42893646,
+        0.51584516,  1.05058312,  0.82968848,  1.30954244,  0.40445746])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+<span class="n">y_hat</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.36877753,  1.04661623,  0.91654494, -0.17603719,  1.42893646,
+        0.51584516,  1.05058312,  0.82968848,  1.30954244,  0.40445746])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="scores-to-probabilities">
+<h3>Scores to probabilities<a class="headerlink" href="#scores-to-probabilities" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The numbers we saw above are “raw model output”.</p></li>
+<li><p>For linear regression this would have been the prediction.</p></li>
+<li><p>For logistic regression, you check the <strong>sign</strong> of this value.</p>
+<ul>
+<li><p>If positive, predict <span class="math notranslate nohighlight">\(+1\)</span>; if negative, predict <span class="math notranslate nohighlight">\(-1\)</span>.</p></li>
+<li><p>These are “hard predictions”.</p></li>
+</ul>
+</li>
+<li><p>You can also have “soft predictions”, aka predicted probabilities.</p>
+<ul>
+<li><p>To convert the raw model output into probabilities, instead of taking the sign, we apply the sigmoid.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="the-sigmoid-function">
+<h3>The sigmoid function<a class="headerlink" href="#the-sigmoid-function" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The sigmoid function “squashes” the raw model output from any number to the range <span class="math notranslate nohighlight">\([0,1]\)</span>.
+$<span class="math notranslate nohighlight">\(\frac{1}{1+e^{-x}}\)</span>$</p></li>
+<li><p>Then we can interpret the output as probabilities.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+<span class="n">raw_model_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">));</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">],</span> <span class="s1">&#39;--k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">],</span> <span class="s1">&#39;--k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;raw model output, $w^Tx$&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;predicted probability&quot;</span><span class="p">);</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;the sigmoid function&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b04f503fad6a3d89da39483943da2f4c6c4d0d6761536dc68cf35d6376458755.png" src="../_images/b04f503fad6a3d89da39483943da2f4c6c4d0d6761536dc68cf35d6376458755.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_hat</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.36877753,  1.04661623,  0.91654494, -0.17603719,  1.42893646,
+        0.51584516,  1.05058312,  0.82968848,  1.30954244,  0.40445746])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.59116355, 0.74012459, 0.71433759, 0.456104  , 0.80673555,
+       0.62617571, 0.74088686, 0.69628906, 0.78743658, 0.59975814])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cities_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/canada_usa_cities.csv&quot;</span><span class="p">)</span>
+<span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">cities_df</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="c1">#mapping = {&#39;Canada&#39;: 1, &#39;USA&#39;: 0}</span>
+<span class="c1">#train_df.replace({&#39;country&#39;: mapping}, inplace=True)</span>
+<span class="c1">#test_df.replace({&#39;country&#39;: mapping}, inplace=True)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">train_df</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">test_df</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span>
+<span class="n">y_train_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;longitude&#39;, &#39;latitude&#39;], dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_bin</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model weights: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="p">))</span> <span class="c1"># these are weights</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model intercept: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">intercept_</span><span class="p">))</span> <span class="c1"># this is the bias term</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="n">X_train</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;coefficients&#39;</span><span class="p">:</span><span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model weights: [[0.04740261 0.10963683]]
+Model intercept: [0.]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>features</th>
+      <th>coefficients</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>longitude</td>
+      <td>0.047403</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>latitude</td>
+      <td>0.109637</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="decision-boundary-of-logistic-regression">
+<h3>Decision boundary of logistic regression<a class="headerlink" href="#decision-boundary-of-logistic-regression" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The decision boundary is a hyperplane dividing the feature space in half.</p></li>
+<li><p>The decision boundary is a <span class="math notranslate nohighlight">\(d-1\)</span>-dimensional hyperplane, where <span class="math notranslate nohighlight">\(d\)</span> is the number of features.</p></li>
+<li><p>You can think of the coefficients as controlling the orientation of the boundary.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plot_classifier</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_bin</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Logistic regression&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/61a8be92cade016f361d1b390fa04fb8130d4c6f14b4fe374986f140f6a4ea0c.png" src="../_images/61a8be92cade016f361d1b390fa04fb8130d4c6f14b4fe374986f140f6a4ea0c.png" />
+</div>
+</div>
+</section>
+<section id="prediction-with-learned-weights">
+<h3>Prediction with learned weights<a class="headerlink" href="#prediction-with-learned-weights" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">example</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+<span class="n">example</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[-64.8001, 46.098]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.982344648567123
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span><span class="o">.</span><span class="n">classes_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0, 1])
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Our threshold here is 0</p></li>
+<li><p>The sign is positive and so predict class 1 (Canada in our case).</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">example</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([1])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="predicting-probabilities">
+<h3>Predicting probabilities<a class="headerlink" href="#predicting-probabilities" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We can get the probability scores (confidence) of the classifier’s prediction using the <code class="docutils literal notranslate"><span class="pre">model.predict_proba</span></code> method.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">([</span><span class="n">example</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.12106912, 0.87893088]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s examine whether we get the same answer if we call sigmoid on <span class="math notranslate nohighlight">\(w^Tx\)</span> or <span class="math notranslate nohighlight">\(x.w\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.982344648567123
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8789308811659498
+</pre></div>
+</div>
+</div>
+</div>
+<p>We get the same probability score!!</p>
+<ul class="simple">
+<li><p>Generally we use regularization with logistic regression.</p></li>
+<li><p>By default, <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s logistic regression uses <code class="docutils literal notranslate"><span class="pre">l2</span></code> penalty with <code class="docutils literal notranslate"><span class="pre">C=1.0</span></code>, where <code class="docutils literal notranslate"><span class="pre">C</span></code> is inverse of regularization strength; smaller values specify stronger regularization.</p></li>
+</ul>
+<blockquote>
+<div><p>class sklearn.linear_model.LogisticRegression(penalty=’l2’, *, dual=False, tol=0.0001, C=1.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None, solver=’lbfgs’, max_iter=100, multi_class=’auto’, verbose=0, warm_start=False, n_jobs=None, l1_ratio=None)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>More than any other topic I’ve seen, logistic regression spans both statistics and ML.</p></li>
+<li><p>In DSCI 562, you’ll learn about logistic regression as a GLM, with the link function, maximum likelihood, etc.</p></li>
+<li><p>That formulation is equivalent, but we’ll do things differently:</p>
+<ul>
+<li><p>In ML, we encode <span class="math notranslate nohighlight">\(y\)</span> as <span class="math notranslate nohighlight">\(+1\)</span> and <span class="math notranslate nohighlight">\(-1\)</span>, as opposed to <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(0\)</span>. This makes our math a bit cleaner.</p></li>
+<li><p>We’ll also think more from an optimization perspective rather than a likelihood / distributional assumptions perspective.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="logistic-regression-fit">
+<h2>Logistic regression: <code class="docutils literal notranslate"><span class="pre">fit</span></code><a class="headerlink" href="#logistic-regression-fit" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Video 2</p></li>
+</ul>
+<section id="goal">
+<h3>Goal<a class="headerlink" href="#goal" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Learn parameters <span class="math notranslate nohighlight">\(w\)</span> and <span class="math notranslate nohighlight">\(b\)</span> which make predictions for each training example as close as possible to the true <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+<li><p>We need two things:</p>
+<ul>
+<li><p><strong>Loss function</strong>: A metric to measure how much a prediction differs from the true <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+<li><p><strong>Optimization algorithm</strong>: for iteratively updating the weights so as to minimize the loss function. (More on this in 572.)</p></li>
+</ul>
+</li>
+<li><p>Assumption: We are going to assume that your classes are -1 and +1.</p></li>
+</ul>
+<p>Note: You’ll learn the maximum likelihood interpretation of the loss in DSCI 562. Here we take a different perspective.</p>
+</section>
+<section id="least-squares-loss-function">
+<h3>Least squares loss function<a class="headerlink" href="#least-squares-loss-function" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We are familiar with least squares loss function used in linear regression.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n (w^Tx_i-y_i)^2\]</div>
+<ul class="simple">
+<li><p>It’s a function of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+<li><p>We define loss of a single example as squared difference between prediction and true target.</p></li>
+<li><p>The total loss is summation of losses over all training examples.</p></li>
+</ul>
+</section>
+<section id="least-squares-for-logistic-regression">
+<h3>Least squares for logistic regression?<a class="headerlink" href="#least-squares-for-logistic-regression" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n (w^Tx_i-y_i)^2\]</div>
+<ul class="simple">
+<li><p>For logistic regression <span class="math notranslate nohighlight">\(y_i\)</span> values are just +1 or -1.</p></li>
+<li><p>The raw model output <span class="math notranslate nohighlight">\(w^Tx_i\)</span> can be any number.</p></li>
+<li><p>Does it make sense to use this loss function for logistic regression?</p>
+<ul>
+<li><p>Not really.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="why-not-least-squares-loss-for-logistic-regression">
+<h3>Why not least squares loss for logistic regression?<a class="headerlink" href="#why-not-least-squares-loss-for-logistic-regression" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n (w^Tx_i-y_i)^2\]</div>
+<ul class="simple">
+<li><p>Example:</p>
+<ul>
+<li><p>Suppose <span class="math notranslate nohighlight">\(w^Tx_i\)</span> (prediction) is 101 and <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(+1\)</span>.</p></li>
+<li><p>The model is behaving correctly, because <span class="math notranslate nohighlight">\(101\)</span> is positive and so it will predict <span class="math notranslate nohighlight">\(+1\)</span>.</p></li>
+<li><p>But according to this loss function, you have a bad prediction because the loss is huge: <span class="math notranslate nohighlight">\((101 - 1)^2 = 10000\)</span>.</p></li>
+</ul>
+</li>
+<li><p>The squared error doesn’t make sense here.</p>
+<ul>
+<li><p>It does not make sense to compare raw model outputs which can be any number to 1 or -1.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="want">
+<h3>Want<a class="headerlink" href="#want" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Need a loss that encourages</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> to be positive when <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(+1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> to be negative when <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(-1\)</span></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="key-idea">
+<h3>Key idea<a class="headerlink" href="#key-idea" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Multiply <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span></strong>.</p></li>
+<li><p>We always want this quantity to be positive because</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(y_i\)</span> and <span class="math notranslate nohighlight">\(w^Tx_i\)</span> have the <em>same sign</em>, the product will be positive.</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is positive and <span class="math notranslate nohighlight">\(y_i\)</span> is positive 🙂</p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is negative and <span class="math notranslate nohighlight">\(y_i\)</span> is negative 🙂</p></li>
+</ul>
+</li>
+<li><p>If they have <em>oppositve signs</em>, the product will be negative.</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is positive and <span class="math notranslate nohighlight">\(y_i\)</span> is negative 😔</p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is negative and <span class="math notranslate nohighlight">\(y_i\)</span> is positive 😔</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>So, we want a loss that’s sort of like
+$<span class="math notranslate nohighlight">\(f(w) = -\sum_{i=1}^n y_iw^Tx_i\)</span>$</p></li>
+<li><p>The negative sign above is because we want to minimize.</p>
+<ul>
+<li><p>Maximizing the actual amount and minimizing the negative amount are the same thing.</p></li>
+</ul>
+</li>
+<li><p>By making this small, we encourage the model to make correct predictions.</p></li>
+<li><p>The above loss does not quite work out. (I believe it has no minimum in most cases.)</p></li>
+</ul>
+</section>
+<section id="logistic-loss">
+<h3>Logistic loss<a class="headerlink" href="#logistic-loss" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>So we do something similar instead:</p>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n\log\left(1+\exp(-y_iw^Tx_i)\right)\]</div>
+</li>
+<li><p>Let’s plot this function.</p></li>
+</ul>
+</section>
+<section id="logistic-loss-intuition">
+<h3>Logistic loss: intuition<a class="headerlink" href="#logistic-loss-intuition" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The function gets smaller as <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> gets larger, so it encourages correct classification.</p></li>
+<li><p>So if we minimize this loss, which means if we move down and to the right, it is encouraging positive values and hence correct predictions.</p></li>
+<li><p>Not perfect but reasonable!</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">fun</span><span class="p">(</span><span class="n">grid</span><span class="p">));</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;$y_iw^Tx_i$&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;loss for one training example&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Logistic loss transformation&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7d5a5e1607c3773c65c676d21a9a0f226815a35e247678d5b84aa3243719e735.png" src="../_images/7d5a5e1607c3773c65c676d21a9a0f226815a35e247678d5b84aa3243719e735.png" />
+</div>
+</div>
+</section>
+<section id="sigmoid-vs-logistic-loss">
+<h3>Sigmoid vs. logistic loss<a class="headerlink" href="#sigmoid-vs-logistic-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>A common source of confusion:</p>
+<ul>
+<li><p>Sigmoid: $<span class="math notranslate nohighlight">\(\frac{1}{(1+\exp(-z))}\)</span>$</p></li>
+<li><p>logistic loss: $<span class="math notranslate nohighlight">\(\log(1+\exp(-z))\)</span>$</p></li>
+</ul>
+</li>
+<li><p>They look very similar and both are used in logistic regression.</p></li>
+<li><p>They have very different purposes.</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Sigmoid vs. logistic loss<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Sigmoid function: $<span class="math notranslate nohighlight">\(\frac{1}{(1+\exp(-z))}\)</span>$</p>
+<ul>
+<li><p>Maps <span class="math notranslate nohighlight">\(w^Tx_i\)</span> to a number in <span class="math notranslate nohighlight">\([0,1]\)</span>, to be interpreted as a probability.</p></li>
+<li><p>This is important in <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Logistic loss: <span class="math notranslate nohighlight">\(\log(1+\exp(-z))\)</span></p>
+<ul>
+<li><p>Maps <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> to a positive number, which is the loss contribution from one training example.</p></li>
+<li><p>This is important in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="hinge-loss-optional">
+<h3>Hinge loss (optional)<a class="headerlink" href="#hinge-loss-optional" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Another loss for linear classifiers is <strong>Hinge loss</strong>, which is:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[max\{0,1-y_iw^Tx_i\}\]</div>
+<ul class="simple">
+<li><p>When you use Hinge loss with L2 regularization, it’s called a linear support vector machine.<br />
+$<span class="math notranslate nohighlight">\(f(w) = \sum_{i=1}^n max\{0,1-y_iw^Tx_i\} + \frac{\lambda}{2} \lVert w\rVert_2^2\)</span>$</p></li>
+<li><p>For more mathematical details on these topics see the following slide decks from CPSC 340.</p>
+<ul>
+<li><p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L20.pdf">Linear classifiers</a></p></li>
+<li><p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L19.pdf">More on linear classifiers</a></p></li>
+</ul>
+</li>
+<li><p>It will make more sense when you learn about optimization.</p></li>
+</ul>
+</section>
+</section>
+<section id="let-s-implement-logistic-loss-function">
+<h2>Let’s implement logistic loss function<a class="headerlink" href="#let-s-implement-logistic-loss-function" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Video 3</p></li>
+</ul>
+<p>Let’s code up logistic loss in Python.</p>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n\log\left(1+\exp(-y_iw^Tx_i)\right)\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_log_loss</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="nd">@w</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Recall that this loss function works when our classes are -1 and 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cities_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/canada_usa_cities.csv&quot;</span><span class="p">)</span>
+<span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">cities_df</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">train_df</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">test_df</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span>
+
+<span class="n">y_train_neg_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>For simplicity we are ignoring the intercept.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_log_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="p">),</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.8431566075896
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">log_loss</span></code> function to get logistic loss.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">log_loss</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">log_loss</span><span class="p">(</span><span class="n">y_train_neg_1</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.84315660758959
+</pre></div>
+</div>
+</div>
+</div>
+<p>In 572, you’ll see how after each iteration of your optimization algorithm your loss changes.</p>
+<section id="another-source-of-confusion">
+<h3>Another source of confusion<a class="headerlink" href="#another-source-of-confusion" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>You might see this alternative formulation for logistic loss.</p></li>
+<li><p>For example see <a class="reference external" href="https://developers.google.com/machine-learning/crash-course/logistic-regression/model-training">here</a> or <a class="reference external" href="https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html">here</a>.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \sum_{x,y \in D} -y log(\hat{y}) - (1-y)log(1-\hat{y})\]</div>
+<ul class="simple">
+<li><p>Although this looks very different than the loss function we saw before, they produce the same loss.</p></li>
+<li><p>This is also referred to as cross-entropy loss.</p></li>
+<li><p>Logistic loss = cross-entropy loss</p></li>
+</ul>
+</section>
+<section id="the-key-difference-between-them">
+<h3>The key difference between them<a class="headerlink" href="#the-key-difference-between-them" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>This formulation assumes the classes to be 0 and 1.
+$<span class="math notranslate nohighlight">\(f(w) = \sum_{x,y \in D} -y log(\hat{y}) - (1-y)log(1-\hat{y})\)</span>$</p></li>
+<li><p>Our previous formulation assumes classes to be -1 and +1.
+$<span class="math notranslate nohighlight">\(f(w)=\sum_{i=1}^n\log\left(1+\exp(-y_iw^Tx_i)\right)\)</span>$</p></li>
+</ul>
+<p>Let’s examine this. The following code</p>
+<ul class="simple">
+<li><p>Replaces Canada with -1 and USA with 1 to create <code class="docutils literal notranslate"><span class="pre">y_train_neg_1</span></code>.</p></li>
+<li><p>Replaces Canada with 0 and USA with 1 to create <code class="docutils literal notranslate"><span class="pre">y_train_0</span></code>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_train_neg_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+<span class="n">y_train_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="let-s-define-our-loss-functions">
+<h3>Let’s define our loss functions<a class="headerlink" href="#let-s-define-our-loss-functions" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_log_loss</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="c1"># this formulation assumes classes to be -1 and 1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="nd">@w</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_cross_ent_loss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">probs</span><span class="p">):</span> <span class="c1"># this formulation assumes classes to be 0 and 1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="n">y</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probs</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s check the loss with <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">log_loss</span></code> in both cases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_loss</span><span class="p">(</span><span class="n">y_train_0</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.84315660758959
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_loss</span><span class="p">(</span><span class="n">y_train_neg_1</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.84315660758959
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s check log loss with <code class="docutils literal notranslate"><span class="pre">y_train_neg_1</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_log_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="p">),</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.8431566075896
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s check cross entropy loss with <code class="docutils literal notranslate"><span class="pre">y_train_0</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_cross_ent_loss</span><span class="p">(</span><span class="n">y_train_0</span><span class="p">,</span> <span class="n">probs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.84315660758959
+</pre></div>
+</div>
+</div>
+</div>
+<p>We get the same result in all cases!!</p>
+</section>
+<section id="error-vs-loss">
+<h3>Error vs. loss<a class="headerlink" href="#error-vs-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>With earlier methods like random forests, we just talked about accuracy (or error rate, which is 1 minus accuracy).</p></li>
+<li><p>With logistic regression, there are two separate metrics we need to keep in mind.</p></li>
+<li><p>scikit-learn’s <code class="docutils literal notranslate"><span class="pre">score</span></code> returns the accuracy.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">);</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6946107784431138
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>So we got this accuracy, and the error is 1 minus this.</p></li>
+<li><p>But the loss is different.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_log_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="p">),</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_neg_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>92.8431566075896
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>So, why not use the error rate as the loss, and directly maximize accuracy?</p></li>
+<li><p>Because it’s not a smooth function, which makes it hard to optimize.</p></li>
+<li><p>This is a bit beyond the scope of the course.</p></li>
+</ul>
+</section>
+</section>
+<section id="softmax">
+<h2>Softmax<a class="headerlink" href="#softmax" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Video 4</p></li>
+</ul>
+<section id="softmax-function">
+<h3>Softmax function<a class="headerlink" href="#softmax-function" title="Permalink to this heading">#</a></h3>
+<p>Standard way to convert numbers in a vector into a probability distribution.</p>
+<p>Intuition:</p>
+<ul class="simple">
+<li><p>Exponentiate to put things in positive land.</p></li>
+<li><p>Normalize to give probability distribution.</p></li>
+</ul>
+<p>Let’s create a vector with random numbers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+<span class="n">vec</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.08702828, -0.22180959,  1.41595878, -1.7871291 , -3.96587657,
+        1.46869959, -2.95684709,  1.12029123, -3.61956621, -1.3392124 ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Exponentiate to put things in positive land.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vec_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+<span class="n">vec_exp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([1.09092753, 0.80106788, 4.12043514, 0.16744018, 0.01895142,
+       4.34358303, 0.05198256, 3.06574692, 0.0267943 , 0.26205198])
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Normalizing gives us a probability distribution.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vec_exp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([1.09092753, 0.80106788, 4.12043514, 0.16744018, 0.01895142,
+       4.34358303, 0.05198256, 3.06574692, 0.0267943 , 0.26205198])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vec_softmax</span> <span class="o">=</span> <span class="n">vec_exp</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vec_exp</span><span class="p">)</span>
+<span class="n">vec_softmax</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.0782084 , 0.05742842, 0.29539327, 0.01200376, 0.00135862,
+       0.31139071, 0.00372662, 0.21978286, 0.00192088, 0.01878646])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vec_softmax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.0000000000000002
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>They sum to 1.0!</p></li>
+</ul>
+<p>Let’s write a function for softmax.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_softmax</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_softmax</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.0782084 , 0.05742842, 0.29539327, 0.01200376, 0.00135862,
+       0.31139071, 0.00372662, 0.21978286, 0.00192088, 0.01878646])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">my_softmax</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.0000000000000002
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="logisticregression-with-multi-class-multinomial">
+<h3><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class=&quot;multinomial&quot;</span></code><a class="headerlink" href="#logisticregression-with-multi-class-multinomial" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>In 571, we carried out multi-class classification with logistic regression using meta strategies such as one-vs-rest and one-vs-one.</p></li>
+<li><p>You can also do multi-class classification using a different loss function called softmax loss, aka the categorical cross-entropy loss for logistic regression with multi-class.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class=&quot;multinomial&quot;</span></code><a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Intuition</p>
+<ul>
+<li><p>The loss tries to make the probability of the correct class large.</p></li>
+<li><p>Which forces the rest to be small since they must add to 1.</p></li>
+<li><p>It’s a generalization of the logistic loss to multi-class.</p></li>
+</ul>
+</li>
+<li><p>Note that softmax function and softmax loss although same in spirit are different things and have different purposes.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Let’s carry out multi-class classification with logistic regression with softmax loss or categorical cross-entropy loss.</p></li>
+<li><p>Let’s try it on the digits data set, which contains images of hand-written digits: 10 classes where each class refers to a digit.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">digits</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_digits</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
+</pre></div>
+</div>
+<img alt="../_images/470d2bbc7530453db8c8f9d26beb4dc0af765f21df7d1988705ffb24281810a7.png" src="../_images/470d2bbc7530453db8c8f9d26beb4dc0af765f21df7d1988705ffb24281810a7.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">digits</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">digits</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_multi</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">multi_class</span><span class="o">=</span><span class="s2">&quot;multinomial&quot;</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">)</span>
+<span class="n">lr_multi</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicted:&quot;</span><span class="p">,</span> <span class="n">lr_multi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Actual:&quot;</span><span class="p">,</span> <span class="n">y_test</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted: 6
+Actual: 6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_multi</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([6.25220632e-08, 3.97982950e-11, 1.40280689e-13, 1.40386857e-13,
+       1.27294274e-09, 2.22986984e-11, 9.99987983e-01, 3.83782018e-11,
+       1.19531779e-05, 1.33030006e-11])
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is the output of softmax. Here is an excerpt from sklearn documentation.</p>
+<blockquote>
+<div><p>For a multi_class problem, if multi_class is set to be “multinomial” the softmax function is used to find the predicted probability of each class. Else use a one-vs-rest approach, i.e calculate the probability of each class assuming it to be positive using the logistic function. and normalize these values across all the classes.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">lr_multi</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>It’s actually the “soft max” because it’s like the max function but “soft”.</p></li>
+</ul>
+</section>
+</section>
+<section id="summary-and-final-remarks">
+<h2>Summary and final remarks<a class="headerlink" href="#summary-and-final-remarks" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Video 5</p></li>
+</ul>
+</section>
+<section id="summary-of-the-course">
+<h2>Summary of the course<a class="headerlink" href="#summary-of-the-course" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>In this course we learned about</p>
+<ul>
+<li><p>Evaluation metrics for classification</p></li>
+<li><p>Class imbalance</p></li>
+<li><p>Evaluation metrics for regression</p></li>
+<li><p>Feature engineering, polynimial basis, radial basis functions</p></li>
+<li><p>Feature importances for linear classifiers</p></li>
+<li><p>Feature selection with RFE, forward selection, L0 penalty</p></li>
+<li><p>Ensemble methods</p></li>
+<li><p>Feature importances and interpretation for non-linear models</p></li>
+<li><p>Loss functions</p></li>
+<li><p>L2 and L1 regularization</p></li>
+<li><p>Logistic loss, softmax</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="map-of-ml-courses-in-mds">
+<h2>Map of ML courses in MDS<a class="headerlink" href="#map-of-ml-courses-in-mds" title="Permalink to this heading">#</a></h2>
+<a class="reference internal image-reference" href="../_images/MDS-ML-map.png"><img alt="../_images/MDS-ML-map.png" src="../_images/MDS-ML-map.png" style="width: 1500px; height: 1500px;" /></a>
+<section id="coming-up">
+<h3>Coming up …<a class="headerlink" href="#coming-up" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Optimization, deep learning, PyTorch, convolution neural networks  (572)</p>
+<ul>
+<li><p>You will be implementing logistic regression on your own in 572!!!</p></li>
+</ul>
+</li>
+<li><p>Clustering, expectation maximization, PCA, recommendation systems (563)</p></li>
+<li><p>Word embeddings, Markov models, topic modeling, recurrent neural networks, long-short term memory networks, image captioning (575)</p></li>
+</ul>
+</section>
+<section id="final-remarks">
+<h3>Final remarks<a class="headerlink" href="#final-remarks" title="Permalink to this heading">#</a></h3>
+<p>I enjoyed teaching you this course! Thank you for your support, your engagement, great questions, and your feedback!
+I hope you now feel comfortable with building a supervised machine learning pipeline for a given prediction problem.</p>
+<p>Enjoy your break and I look forward to teach you again next year :)!</p>
+<p><img alt="image.png" src="_lectures/attachment:image.png" /></p>
+<p>FYI: The online course evaluations are up, it’ll be great if you can fill them in when you get a chance.</p>
+</section>
+<section id="true-false-questions-for-class-discussion-videos-1-and-2">
+<h3>True/False questions for class discussion (Videos 1 and 2)<a class="headerlink" href="#true-false-questions-for-class-discussion-videos-1-and-2" title="Permalink to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>When the term <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> in logistic loss is positive, it means we have a correct prediction.</p></li>
+<li><p>Minimizing logistic loss leads to mapping <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> to a positive number.</p></li>
+<li><p>Using least squares loss for logistic regression makes sense because logistic regression is very similar to linear regression except that it’s used for classification.</p></li>
+<li><p>Logistic loss formulation we looked at expects the target values to be -1 and +1.</p></li>
+<li><p>Sigmoid and logistic loss are basically the same thing with different names.</p></li>
+</ol>
+</section>
+<section id="true-false-questions-for-class-discussion-videos-3-and-4">
+<h3>True/False questions for class discussion (Videos 3 and 4)<a class="headerlink" href="#true-false-questions-for-class-discussion-videos-3-and-4" title="Permalink to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Loss is basically the same as error (1 - accuracy) on the training set.</p></li>
+<li><p>If you add L2 regularization to logistic loss, you would expect the loss to go down.</p></li>
+<li><p>If you add L2 regularization to logistic loss, you would expect a lower training score but potentially higher CV score if it helped with overfitting.</p></li>
+<li><p>When you apply the softmax function you may end up messing up the scale of the numbers in your vector.</p></li>
+<li><p>You can use logistic regression with softmax or multinomial cross-entropy loss for multi-class classification problems.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-571-py"
+        },
+        kernelOptions: {
+            name: "conda-env-571-py",
+            path: "./_lectures"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-571-py'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-8-more-about-logistic-regression">Lecture 8: More about Logistic Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-regression-predict">1. Logistic regression: <code class="docutils literal notranslate"><span class="pre">predict</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-of-ones-trick">“column of ones” trick</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-of-ones-trick-example">“column of ones” trick: example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vectorization">Vectorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scores-to-probabilities">Scores to probabilities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-sigmoid-function">The sigmoid function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-boundary-of-logistic-regression">Decision boundary of logistic regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prediction-with-learned-weights">Prediction with learned weights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-probabilities">Predicting probabilities</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-regression-fit">Logistic regression: <code class="docutils literal notranslate"><span class="pre">fit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#goal">Goal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-loss-function">Least squares loss function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-for-logistic-regression">Least squares for logistic regression?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-not-least-squares-loss-for-logistic-regression">Why not least squares loss for logistic regression?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#want">Want</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-idea">Key idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss">Logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss-intuition">Logistic loss: intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sigmoid-vs-logistic-loss">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hinge-loss-optional">Hinge loss (optional)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#let-s-implement-logistic-loss-function">Let’s implement logistic loss function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-source-of-confusion">Another source of confusion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-difference-between-them">The key difference between them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#let-s-define-our-loss-functions">Let’s define our loss functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-vs-loss">Error vs. loss</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax">Softmax</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax-function">Softmax function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logisticregression-with-multi-class-multinomial"><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class="multinomial"</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> with <code class="docutils literal notranslate"><span class="pre">multi_class="multinomial"</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-final-remarks">Summary and final remarks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-course">Summary of the course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-of-ml-courses-in-mds">Map of ML courses in MDS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coming-up">Coming up …</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-remarks">Final remarks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#true-false-questions-for-class-discussion-videos-1-and-2">True/False questions for class discussion (Videos 1 and 2)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#true-false-questions-for-class-discussion-videos-3-and-4">True/False questions for class discussion (Videos 3 and 4)</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar and Joel Östblom
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

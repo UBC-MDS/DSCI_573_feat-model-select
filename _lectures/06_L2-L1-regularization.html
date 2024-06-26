@@ -1,0 +1,3013 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lecture 6: L2- and L1-Regularization &#8212; DSCI 573 Feature and Model Selection</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_lectures/06_L2-L1-regularization';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01_classification-metrics.html">Lecture 1: Classification metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02_regression-metrics.html">Lecture 2: Regression metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03_feature-engineering.html">Lecture 3: Feature engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04_feat-importances-selection.html">Lecture 4: Feature importances and feature selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05_loss-functions-regularization_intro.html">Lecture 5: Loss functions, intro to regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06_L2-L1-regularization.html">Lecture 6: L2- and L1-Regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07_ensembles.html">Lecture 7: Ensembles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08_model-transparency-conclusion.html">Lecture 8: Model transparency and conclusion</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_lectures/06_L2-L1-regularization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lecture 6: L2- and L1-Regularization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap">Recap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">Idea of regularization: Pick the line/hyperplane with smaller slope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-quantify-model-complexity">How to quantify model complexity?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l0-regularization">L0-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l2-regularization">L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sklearn-s-ridge-or-l2-regularization"><code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> or L2 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-l2-regularization-shrinking">Example: L2-Regularization “Shrinking”</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-weights-become-smaller-but-do-not-become-zero">The weights become smaller but do not become zero</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-path">Regularization path</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-learning-curves">Regularization learning curves</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-pick-lambda">How to pick <span class="math notranslate nohighlight">\(\lambda\)</span>?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-should-we-regularize-the-y-intercept">(Optional) Should we regularize the y-intercept?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#some-properties-of-l2-regularization">Some properties of L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-l2-regularization">Summary: L2-regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you-recap">❓❓ Questions for you (recap)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iclicker-exercise-6-1">iClicker Exercise 6.1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#break-5-mins">Break (~5 mins)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#l1-regularization">L1 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#similarities-with-l2-regularization">Similarities with L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation-ridge-and-lasso">Terminology and notation: Ridge and Lasso</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">L1-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-weights-become-smaller-and-eventually-become-zero">The weights become smaller and eventually become zero.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation-sparsity">Terminology and notation: Sparsity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-l0-vs-l1-vs-l2">Example: L0 vs. L1 vs. L2</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l0-regularization">Which one would you choose with L0 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l1-regularization">Which one would you choose with L1 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l2-regularization">Which one would you choose with L2 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-sparsity-and-regularization">(Optional) Sparsity and Regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-and-regularization-with-d-1">Sparsity and Regularization (with d=1)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#some-properties-of-l1-regularization">Some properties of L1 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-selection-using-l1-regularization">Feature selection using L1 regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularized-models-for-classification">Regularized models for classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularized-logistic-regression">Regularized logistic regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-regularization-with-scikit-learn-some-examples">How to use regularization with <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>: some examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-scaling-and-collinearity">Regularization: scaling and collinearity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-and-scaling">Regularization and scaling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collinearity-and-regularization">Collinearity and regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elastic-nets">Elastic nets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-l-regularization">Summary: L* regularization</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <p><img alt="" src="_lectures/img/573_banner.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lecture-6-l2-and-l1-regularization">
+<h1>Lecture 6: L2- and L1-Regularization<a class="headerlink" href="#lecture-6-l2-and-l1-regularization" title="Permalink to this heading">#</a></h1>
+<p>UBC Master of Data Science program, 2022-23</p>
+<p>Instructor: Varada Kolhatkar</p>
+<p>Atrribution: A lot of this material is adapted from <a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L18.pdf">CPSC 340</a> lecture notes.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;code/.&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">mglearn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">npla</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">npr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">plotting_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span><span class="p">,</span> <span class="n">DummyRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">RidgeCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">cross_validate</span><span class="p">,</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">StandardScaler</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_colwidth&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="learning-outcomes">
+<h3>Learning outcomes<a class="headerlink" href="#learning-outcomes" title="Permalink to this heading">#</a></h3>
+<p>From this lecture, students are expected to be able to:</p>
+<ul class="simple">
+<li><p>Broadly explain L2 regularization (Ridge).</p></li>
+<li><p>Use L2 regularization (Ridge) using <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>.</p></li>
+<li><p>Compare L0- and L2-regularization.</p></li>
+<li><p>Explain the relation between the size of regression weights, overfitting, and complexity hyperparameters.</p></li>
+<li><p>Explain the effect of training data size and effect of regularization.</p></li>
+<li><p>Explain the general idea of L1-regularization.</p></li>
+<li><p>Learn to be skeptical about interpretation of the coefficients.</p></li>
+<li><p>Use L1-regularization (Lasso) using <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>.</p></li>
+<li><p>Discuss sparsity in L1-regularization.</p></li>
+<li><p>Compare L0-, L1-, and L2-regularization.</p></li>
+<li><p>Use L1 regularization for feature selection.</p></li>
+<li><p>Explain the importance of scaling when using L1- and L2-regularization</p></li>
+<li><p>Broadly explain how L1 and L2 regularization behave in the presence of collinear features.</p></li>
+</ul>
+</section>
+</section>
+<section id="recap">
+<h2>Recap<a class="headerlink" href="#recap" title="Permalink to this heading">#</a></h2>
+<section id="idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">
+<h3>Idea of regularization: Pick the line/hyperplane with smaller slope<a class="headerlink" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Assuming the models below (dashed and solid green lines) have the same training error and if you are forced to choose one of them, which one would you pick?</p>
+<ul>
+<li><p><strong>Pick the solid green line because its slope is smaller.</strong></p></li>
+<li><p>Small change in <span class="math notranslate nohighlight">\(x_i\)</span> has a smaller change in prediction <span class="math notranslate nohighlight">\(y_i\)</span></p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(w\)</span> is less sensitive to the training data, it’s likely to generalize better.<br />
+<img alt="" src="_lectures/img/regularization.png" /></p></li>
+</ul>
+</li>
+</ul>
+<!-- <img src='img/green_or_red.png' width="600" height="600" /> -->
+<ul class="simple">
+<li><p>Regularization is a technique for controlling model complexity.</p>
+<ul>
+<li><p>Instead of minimizing just the Loss, minimize <strong>Loss + <span class="math notranslate nohighlight">\(\lambda \)</span> Model complexity</strong></p></li>
+<li><p>Loss: measures how well the model fits the data.</p></li>
+<li><p>Model complexity: measures model complexity (also referred to as <strong>regularization term</strong>)</p></li>
+<li><p>A scalar <span class="math notranslate nohighlight">\(\lambda\)</span> decides the overall impact of the regularization term.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="how-to-quantify-model-complexity">
+<h3>How to quantify model complexity?<a class="headerlink" href="#how-to-quantify-model-complexity" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Total number of features with non-zero weights</p>
+<ul>
+<li><p>L0 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert_0\)</span>, L0 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+</ul>
+</li>
+<li><p>As a function of weights: A feature weight with high absolute value is more complex than the feature weight with low absolute value.</p>
+<ul>
+<li><p>L2 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert_2^2\)</span>, square of the L2 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+<li><p>L1 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert_1\)</span>, L1 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="l0-regularization">
+<h3>L0-regularization<a class="headerlink" href="#l0-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>L0-regularization.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_0\]</div>
+<ul class="simple">
+<li><p>Regularization parameter <span class="math notranslate nohighlight">\(\lambda\)</span> controls the strength of regularization.</p></li>
+<li><p>To increase the degrees of freedom by one, need to decrease the error by <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
+<li><p>Prefer smaller degrees of freedom if errors are similar.</p></li>
+<li><p>Can’t optimize because the function is discontinuous in <span class="math notranslate nohighlight">\(\lVert w\rVert_0\)</span></p>
+<ul>
+<li><p>Search over possible models</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="l2-regularization">
+<h3>L2-regularization<a class="headerlink" href="#l2-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Standard regularization strategy is L2-regularization.</p></li>
+<li><p>Also referred to as <strong>Ridge</strong>.</p></li>
+<li><p>The loss function has an L2 penalty term.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_2^2\]</div>
+<ul class="simple">
+<li><p>Regularization parameter <span class="math notranslate nohighlight">\(\lambda\)</span> controls the strength of regularization.</p>
+<ul>
+<li><p>bigger <span class="math notranslate nohighlight">\(\lambda\)</span> <span class="math notranslate nohighlight">\(\rightarrow\)</span> more regularization <span class="math notranslate nohighlight">\(\rightarrow\)</span> lower weights</p></li>
+</ul>
+</li>
+<li><p>Setting <span class="math notranslate nohighlight">\(\lambda = 0\)</span> is the same as using OLS</p>
+<ul>
+<li><p>Low training error, high variance, bigger weights, likely to overfit</p></li>
+</ul>
+</li>
+<li><p>Setting <span class="math notranslate nohighlight">\(\lambda\)</span> to a large value leads to smaller weights</p>
+<ul>
+<li><p>Higher training error, low variance, high bias, smaller weights, likely to underfit</p></li>
+</ul>
+</li>
+<li><p>We want to strike a balance between these two extremes, which we can control by optimizing the value for <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
+</ul>
+</section>
+<section id="sklearn-s-ridge-or-l2-regularization">
+<h3><code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> or L2 regularization<a class="headerlink" href="#sklearn-s-ridge-or-l2-regularization" title="Permalink to this heading">#</a></h3>
+<p>Let’s bring back <code class="docutils literal notranslate"><span class="pre">sklearn's</span></code> California housing dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_california_housing</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+
+<span class="n">housing</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">housing</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">housing</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+
+<span class="n">pf</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_train_poly</span><span class="p">,</span> <span class="n">X_test_poly</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train_poly</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test_poly</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(15480, 44)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s explore L2 regularization with this dataset.</p>
+</section>
+<section id="example-l2-regularization-shrinking">
+<h3>Example: L2-Regularization “Shrinking”<a class="headerlink" href="#example-l2-regularization-shrinking" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lambda\)</span> in the formulation above is <code class="docutils literal notranslate"><span class="pre">alpha</span></code> in <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>.</p></li>
+<li><p>We get least squares with <span class="math notranslate nohighlight">\(\lambda = 0\)</span>.</p></li>
+<li><p>As we increase <span class="math notranslate nohighlight">\(\alpha\)</span></p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\lVert Xw - y\rVert_2^2\)</span> goes <span class="math notranslate nohighlight">\(\uparrow\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w\rVert_2^2\)</span>  goes <span class="math notranslate nohighlight">\(\downarrow\)</span></p></li>
+<li><p>Though individual <span class="math notranslate nohighlight">\(w_j\)</span> can increase or decrease with lambda because we use the L2-norm, the large ones decrease the most.</p></li>
+</ul>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lr_loss_squared</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="c1"># define OLS loss function</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">w</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">]</span>
+<span class="n">weight_shrinkage_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:[],</span> <span class="s1">&#39;||Xw - y||^2&#39;</span><span class="p">:[],</span> <span class="s1">&#39;||w||^2&#39;</span><span class="p">:[],</span> <span class="s1">&#39;intercept&#39;</span><span class="p">:[],</span> <span class="s1">&#39;train score&#39;</span><span class="p">:[],</span> <span class="s1">&#39;test score&#39;</span><span class="p">:[]}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphas</span><span class="p">):</span> 
+    <span class="n">r</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span> 
+    <span class="n">r</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">OLS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">lr_loss_squared</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">l2_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">intercept_</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;||Xw - y||^2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OLS</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;||w||^2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l2_term</span><span class="p">)</span>    
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;intercept&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intercept</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;train score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;test score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">weight_shrinkage_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>alpha</th>
+      <th>||Xw - y||^2</th>
+      <th>||w||^2</th>
+      <th>intercept</th>
+      <th>train score</th>
+      <th>test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.00</td>
+      <td>73099.4882</td>
+      <td>7634.4579</td>
+      <td>2.0744</td>
+      <td>0.69</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.01</td>
+      <td>73113.1963</td>
+      <td>4239.9359</td>
+      <td>2.0744</td>
+      <td>0.69</td>
+      <td>-0.17</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.10</td>
+      <td>73222.8589</td>
+      <td>888.3987</td>
+      <td>2.0744</td>
+      <td>0.68</td>
+      <td>0.62</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.00</td>
+      <td>73437.3112</td>
+      <td>77.0152</td>
+      <td>2.0744</td>
+      <td>0.67</td>
+      <td>0.02</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>10.00</td>
+      <td>73597.9629</td>
+      <td>8.4983</td>
+      <td>2.0744</td>
+      <td>0.66</td>
+      <td>-3.80</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>100.00</td>
+      <td>73777.7373</td>
+      <td>2.5195</td>
+      <td>2.0744</td>
+      <td>0.65</td>
+      <td>-3.37</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1000.00</td>
+      <td>74363.2804</td>
+      <td>0.7118</td>
+      <td>2.0744</td>
+      <td>0.62</td>
+      <td>0.10</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1000000.00</td>
+      <td>85565.9420</td>
+      <td>0.0008</td>
+      <td>2.0744</td>
+      <td>0.08</td>
+      <td>0.08</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>In this example, as <code class="docutils literal notranslate"><span class="pre">alpha</span></code> goes up</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lVert Xw - y\rVert_2^2\)</span> is increasing</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w\rVert_2^2\)</span>  is decreasing; weight become smaller and smaller</p></li>
+<li><p>The intercept stays the same. It’s the mean of the target – dummy model prediction.</p></li>
+<li><p>We are getting best test score for <code class="docutils literal notranslate"><span class="pre">alpha=0.10</span></code>.</p></li>
+<li><p>The total loss is worse than OLS but it’s helping with generalization.</p></li>
+</ul>
+<p><br><br></p>
+</section>
+<section id="the-weights-become-smaller-but-do-not-become-zero">
+<h3>The weights become smaller but do not become zero<a class="headerlink" href="#the-weights-become-smaller-but-do-not-become-zero" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>As <code class="docutils literal notranslate"><span class="pre">alpha</span></code> goes up, we increase the regularization strength.</p></li>
+<li><p>The weights become smaller and smaller but tend not to become exactly zero.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span><span class="s1">&#39;^&#39;</span><span class="p">]</span>
+<span class="n">ridge_models</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphas</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ridge alpha=&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Coefficient index&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Coefficient magnitude&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>    
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/753649090a65ad77aa5f60605741348daee452ad75d372a6d2e7fe0added299a.png" src="../_images/753649090a65ad77aa5f60605741348daee452ad75d372a6d2e7fe0added299a.png" />
+</div>
+</div>
+<p>Let’s try a very large <code class="docutils literal notranslate"><span class="pre">alpha</span></code> value, which is likely to make weights very small.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ridge10000</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of features&quot;</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of non-zero weights: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ridge10000</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total number of features 44
+Number of non-zero weights:  44
+</pre></div>
+</div>
+</div>
+</div>
+<p>All features have non-zero weights.</p>
+</section>
+<section id="regularization-path">
+<h3>Regularization path<a class="headerlink" href="#regularization-path" title="Permalink to this heading">#</a></h3>
+<p>Let’s trace the journey of coefficients of a few features with different values of <code class="docutils literal notranslate"><span class="pre">alpha</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s examine the coefficients</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r10</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+<span class="n">r10</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r10</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;coef&quot;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;coef != 0&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;coef&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;variable&quot;</span><span class="p">})</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coefs</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">background_gradient</span><span class="p">(</span><span class="s1">&#39;PuOr&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+#T_23f4d_row0_col1 {
+  background-color: #7f3b08;
+  color: #f1f1f1;
+}
+#T_23f4d_row1_col1 {
+  background-color: #eb9733;
+  color: #f1f1f1;
+}
+#T_23f4d_row2_col1 {
+  background-color: #f1a242;
+  color: #000000;
+}
+#T_23f4d_row3_col1 {
+  background-color: #fecf92;
+  color: #000000;
+}
+#T_23f4d_row4_col1 {
+  background-color: #fee1b9;
+  color: #000000;
+}
+#T_23f4d_row5_col1 {
+  background-color: #f5f5f6;
+  color: #000000;
+}
+#T_23f4d_row6_col1 {
+  background-color: #ededf3;
+  color: #000000;
+}
+#T_23f4d_row7_col1 {
+  background-color: #eaebf2;
+  color: #000000;
+}
+#T_23f4d_row8_col1, #T_23f4d_row9_col1 {
+  background-color: #e7e8f1;
+  color: #000000;
+}
+#T_23f4d_row10_col1 {
+  background-color: #e5e7f0;
+  color: #000000;
+}
+#T_23f4d_row11_col1, #T_23f4d_row12_col1 {
+  background-color: #dadcec;
+  color: #000000;
+}
+#T_23f4d_row13_col1 {
+  background-color: #d9dbeb;
+  color: #000000;
+}
+#T_23f4d_row14_col1 {
+  background-color: #d8daeb;
+  color: #000000;
+}
+#T_23f4d_row15_col1 {
+  background-color: #d7d8ea;
+  color: #000000;
+}
+#T_23f4d_row16_col1, #T_23f4d_row17_col1 {
+  background-color: #d5d6e9;
+  color: #000000;
+}
+#T_23f4d_row18_col1 {
+  background-color: #d4d4e8;
+  color: #000000;
+}
+#T_23f4d_row19_col1, #T_23f4d_row20_col1 {
+  background-color: #d2d3e7;
+  color: #000000;
+}
+#T_23f4d_row21_col1, #T_23f4d_row22_col1 {
+  background-color: #d1d1e6;
+  color: #000000;
+}
+#T_23f4d_row23_col1 {
+  background-color: #cfcfe5;
+  color: #000000;
+}
+#T_23f4d_row24_col1 {
+  background-color: #cecde4;
+  color: #000000;
+}
+#T_23f4d_row25_col1, #T_23f4d_row26_col1 {
+  background-color: #cccbe3;
+  color: #000000;
+}
+#T_23f4d_row27_col1, #T_23f4d_row28_col1, #T_23f4d_row29_col1 {
+  background-color: #cbc9e2;
+  color: #000000;
+}
+#T_23f4d_row30_col1 {
+  background-color: #c9c8e1;
+  color: #000000;
+}
+#T_23f4d_row31_col1, #T_23f4d_row32_col1, #T_23f4d_row33_col1 {
+  background-color: #c6c4df;
+  color: #000000;
+}
+#T_23f4d_row34_col1 {
+  background-color: #c3c0dd;
+  color: #000000;
+}
+#T_23f4d_row35_col1 {
+  background-color: #bcb7d8;
+  color: #000000;
+}
+#T_23f4d_row36_col1 {
+  background-color: #b1aad1;
+  color: #000000;
+}
+#T_23f4d_row37_col1 {
+  background-color: #afa8d0;
+  color: #000000;
+}
+#T_23f4d_row38_col1 {
+  background-color: #9990bf;
+  color: #f1f1f1;
+}
+#T_23f4d_row39_col1 {
+  background-color: #988dbe;
+  color: #f1f1f1;
+}
+#T_23f4d_row40_col1 {
+  background-color: #8e82b6;
+  color: #f1f1f1;
+}
+#T_23f4d_row41_col1 {
+  background-color: #6d529c;
+  color: #f1f1f1;
+}
+#T_23f4d_row42_col1 {
+  background-color: #41146a;
+  color: #f1f1f1;
+}
+#T_23f4d_row43_col1 {
+  background-color: #2d004b;
+  color: #f1f1f1;
+}
+</style>
+<table id="T_23f4d">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_23f4d_level0_col0" class="col_heading level0 col0" >variable</th>
+      <th id="T_23f4d_level0_col1" class="col_heading level0 col1" >coef</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_23f4d_level0_row0" class="row_heading level0 row0" >0</th>
+      <td id="T_23f4d_row0_col0" class="data row0 col0" >MedInc Longitude</td>
+      <td id="T_23f4d_row0_col1" class="data row0 col1" >-16.762873</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row1" class="row_heading level0 row1" >1</th>
+      <td id="T_23f4d_row1_col0" class="data row1 col0" >MedInc</td>
+      <td id="T_23f4d_row1_col1" class="data row1 col1" >-10.178537</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row2" class="row_heading level0 row2" >2</th>
+      <td id="T_23f4d_row2_col0" class="data row2 col0" >HouseAge Longitude</td>
+      <td id="T_23f4d_row2_col1" class="data row2 col1" >-9.608717</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row3" class="row_heading level0 row3" >3</th>
+      <td id="T_23f4d_row3_col0" class="data row3 col0" >HouseAge</td>
+      <td id="T_23f4d_row3_col1" class="data row3 col1" >-6.986869</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row4" class="row_heading level0 row4" >4</th>
+      <td id="T_23f4d_row4_col0" class="data row4 col0" >MedInc Latitude</td>
+      <td id="T_23f4d_row4_col1" class="data row4 col1" >-5.683734</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row5" class="row_heading level0 row5" >5</th>
+      <td id="T_23f4d_row5_col0" class="data row5 col0" >HouseAge Latitude</td>
+      <td id="T_23f4d_row5_col1" class="data row5 col1" >-2.931366</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row6" class="row_heading level0 row6" >6</th>
+      <td id="T_23f4d_row6_col0" class="data row6 col0" >AveBedrms Longitude</td>
+      <td id="T_23f4d_row6_col1" class="data row6 col1" >-2.152434</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row7" class="row_heading level0 row7" >7</th>
+      <td id="T_23f4d_row7_col0" class="data row7 col0" >AveBedrms Latitude</td>
+      <td id="T_23f4d_row7_col1" class="data row7 col1" >-1.934514</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row8" class="row_heading level0 row8" >8</th>
+      <td id="T_23f4d_row8_col0" class="data row8 col0" >Longitude</td>
+      <td id="T_23f4d_row8_col1" class="data row8 col1" >-1.637599</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row9" class="row_heading level0 row9" >9</th>
+      <td id="T_23f4d_row9_col0" class="data row9 col0" >AveRooms AveBedrms</td>
+      <td id="T_23f4d_row9_col1" class="data row9 col1" >-1.571689</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row10" class="row_heading level0 row10" >10</th>
+      <td id="T_23f4d_row10_col0" class="data row10 col0" >AveBedrms AveOccup</td>
+      <td id="T_23f4d_row10_col1" class="data row10 col1" >-1.536152</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row11" class="row_heading level0 row11" >11</th>
+      <td id="T_23f4d_row11_col0" class="data row11 col0" >MedInc^2</td>
+      <td id="T_23f4d_row11_col1" class="data row11 col1" >-0.540772</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row12" class="row_heading level0 row12" >12</th>
+      <td id="T_23f4d_row12_col0" class="data row12 col0" >AveRooms Population</td>
+      <td id="T_23f4d_row12_col1" class="data row12 col1" >-0.518624</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row13" class="row_heading level0 row13" >13</th>
+      <td id="T_23f4d_row13_col0" class="data row13 col0" >HouseAge AveOccup</td>
+      <td id="T_23f4d_row13_col1" class="data row13 col1" >-0.414707</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row14" class="row_heading level0 row14" >14</th>
+      <td id="T_23f4d_row14_col0" class="data row14 col0" >HouseAge AveRooms</td>
+      <td id="T_23f4d_row14_col1" class="data row14 col1" >-0.376728</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row15" class="row_heading level0 row15" >15</th>
+      <td id="T_23f4d_row15_col0" class="data row15 col0" >MedInc AveBedrms</td>
+      <td id="T_23f4d_row15_col1" class="data row15 col1" >-0.280714</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row16" class="row_heading level0 row16" >16</th>
+      <td id="T_23f4d_row16_col0" class="data row16 col0" >Population</td>
+      <td id="T_23f4d_row16_col1" class="data row16 col1" >-0.106295</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row17" class="row_heading level0 row17" >17</th>
+      <td id="T_23f4d_row17_col0" class="data row17 col0" >MedInc AveOccup</td>
+      <td id="T_23f4d_row17_col1" class="data row17 col1" >-0.072894</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row18" class="row_heading level0 row18" >18</th>
+      <td id="T_23f4d_row18_col0" class="data row18 col0" >AveBedrms</td>
+      <td id="T_23f4d_row18_col1" class="data row18 col1" >-0.067099</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row19" class="row_heading level0 row19" >19</th>
+      <td id="T_23f4d_row19_col0" class="data row19 col0" >Population^2</td>
+      <td id="T_23f4d_row19_col1" class="data row19 col1" >0.050877</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row20" class="row_heading level0 row20" >20</th>
+      <td id="T_23f4d_row20_col0" class="data row20 col0" >HouseAge Population</td>
+      <td id="T_23f4d_row20_col1" class="data row20 col1" >0.076735</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row21" class="row_heading level0 row21" >21</th>
+      <td id="T_23f4d_row21_col0" class="data row21 col0" >AveOccup^2</td>
+      <td id="T_23f4d_row21_col1" class="data row21 col1" >0.177787</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row22" class="row_heading level0 row22" >22</th>
+      <td id="T_23f4d_row22_col0" class="data row22 col0" >HouseAge^2</td>
+      <td id="T_23f4d_row22_col1" class="data row22 col1" >0.197444</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row23" class="row_heading level0 row23" >23</th>
+      <td id="T_23f4d_row23_col0" class="data row23 col0" >MedInc HouseAge</td>
+      <td id="T_23f4d_row23_col1" class="data row23 col1" >0.292222</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row24" class="row_heading level0 row24" >24</th>
+      <td id="T_23f4d_row24_col0" class="data row24 col0" >MedInc Population</td>
+      <td id="T_23f4d_row24_col1" class="data row24 col1" >0.358598</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row25" class="row_heading level0 row25" >25</th>
+      <td id="T_23f4d_row25_col0" class="data row25 col0" >HouseAge AveBedrms</td>
+      <td id="T_23f4d_row25_col1" class="data row25 col1" >0.495107</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row26" class="row_heading level0 row26" >26</th>
+      <td id="T_23f4d_row26_col0" class="data row26 col0" >MedInc AveRooms</td>
+      <td id="T_23f4d_row26_col1" class="data row26 col1" >0.544633</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row27" class="row_heading level0 row27" >27</th>
+      <td id="T_23f4d_row27_col0" class="data row27 col0" >Population Latitude</td>
+      <td id="T_23f4d_row27_col1" class="data row27 col1" >0.573911</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row28" class="row_heading level0 row28" >28</th>
+      <td id="T_23f4d_row28_col0" class="data row28 col0" >Population AveOccup</td>
+      <td id="T_23f4d_row28_col1" class="data row28 col1" >0.603423</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row29" class="row_heading level0 row29" >29</th>
+      <td id="T_23f4d_row29_col0" class="data row29 col0" >AveBedrms^2</td>
+      <td id="T_23f4d_row29_col1" class="data row29 col1" >0.620403</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row30" class="row_heading level0 row30" >30</th>
+      <td id="T_23f4d_row30_col0" class="data row30 col0" >AveBedrms Population</td>
+      <td id="T_23f4d_row30_col1" class="data row30 col1" >0.780217</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row31" class="row_heading level0 row31" >31</th>
+      <td id="T_23f4d_row31_col0" class="data row31 col0" >AveRooms</td>
+      <td id="T_23f4d_row31_col1" class="data row31 col1" >0.908226</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row32" class="row_heading level0 row32" >32</th>
+      <td id="T_23f4d_row32_col0" class="data row32 col0" >AveRooms^2</td>
+      <td id="T_23f4d_row32_col1" class="data row32 col1" >0.940577</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row33" class="row_heading level0 row33" >33</th>
+      <td id="T_23f4d_row33_col0" class="data row33 col0" >Longitude^2</td>
+      <td id="T_23f4d_row33_col1" class="data row33 col1" >0.944154</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row34" class="row_heading level0 row34" >34</th>
+      <td id="T_23f4d_row34_col0" class="data row34 col0" >Population Longitude</td>
+      <td id="T_23f4d_row34_col1" class="data row34 col1" >1.199605</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row35" class="row_heading level0 row35" >35</th>
+      <td id="T_23f4d_row35_col0" class="data row35 col0" >AveRooms AveOccup</td>
+      <td id="T_23f4d_row35_col1" class="data row35 col1" >1.697423</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row36" class="row_heading level0 row36" >36</th>
+      <td id="T_23f4d_row36_col0" class="data row36 col0" >AveOccup</td>
+      <td id="T_23f4d_row36_col1" class="data row36 col1" >2.478821</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row37" class="row_heading level0 row37" >37</th>
+      <td id="T_23f4d_row37_col0" class="data row37 col0" >AveRooms Latitude</td>
+      <td id="T_23f4d_row37_col1" class="data row37 col1" >2.523284</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row38" class="row_heading level0 row38" >38</th>
+      <td id="T_23f4d_row38_col0" class="data row38 col0" >AveRooms Longitude</td>
+      <td id="T_23f4d_row38_col1" class="data row38 col1" >3.693662</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row39" class="row_heading level0 row39" >39</th>
+      <td id="T_23f4d_row39_col0" class="data row39 col0" >Latitude</td>
+      <td id="T_23f4d_row39_col1" class="data row39 col1" >3.830685</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row40" class="row_heading level0 row40" >40</th>
+      <td id="T_23f4d_row40_col0" class="data row40 col0" >Latitude^2</td>
+      <td id="T_23f4d_row40_col1" class="data row40 col1" >4.330258</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row41" class="row_heading level0 row41" >41</th>
+      <td id="T_23f4d_row41_col0" class="data row41 col0" >AveOccup Latitude</td>
+      <td id="T_23f4d_row41_col1" class="data row41 col1" >6.270548</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row42" class="row_heading level0 row42" >42</th>
+      <td id="T_23f4d_row42_col0" class="data row42 col0" >AveOccup Longitude</td>
+      <td id="T_23f4d_row42_col1" class="data row42 col1" >9.143782</td>
+    </tr>
+    <tr>
+      <th id="T_23f4d_level0_row43" class="row_heading level0 row43" >43</th>
+      <td id="T_23f4d_row43_col0" class="data row43 col0" >Latitude Longitude</td>
+      <td id="T_23f4d_row43_col1" class="data row43 col1" >10.627639</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MedInc&#39;</span><span class="p">,</span> <span class="s1">&#39;AveBedrms&#39;</span><span class="p">,</span>  <span class="s1">&#39;Population&#39;</span><span class="p">,</span> <span class="s1">&#39;MedInc Longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Population Longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Latitude Longitude&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">msk</span> <span class="o">=</span> <span class="p">[</span><span class="n">feat</span> <span class="ow">in</span> <span class="n">feats</span> <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">feature_names</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#feature_names</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r10</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="n">msk</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-10.17853657,  -0.06709887,  -0.10629543, -16.7628735 ,
+         1.19960525,  10.6276393 ])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Attribution: Code adapted from here: https://scikit-learn.org/stable/auto_examples/linear_model/plot_ridge_path.html</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+
+<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
+
+<span class="n">coefs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">:</span>
+    <span class="n">ridge</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ridge</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">coefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ridge</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="n">msk</span><span class="p">])</span>
+    
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">coefs</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="c1">#ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;weights&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Ridge coefficients as a function of the regularization&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7074053b90a94b8ec6e8898d8ae9360bc935e8b7e829fd86eb4805d7a8849ea0.png" src="../_images/7074053b90a94b8ec6e8898d8ae9360bc935e8b7e829fd86eb4805d7a8849ea0.png" />
+</div>
+</div>
+<p>The coefficients are very close to zero but not exactly zero. That said, they won’t have much impact on prediction.</p>
+<p><br><br></p>
+</section>
+<section id="regularization-learning-curves">
+<h3>Regularization learning curves<a class="headerlink" href="#regularization-learning-curves" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_learning_curve</span><span class="p">(</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">plot_learning_curve</span><span class="p">(</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/016c65d8aa215432a7ad8deb6443416b263632ad6eb53b7efe597ef98da05abb.png" src="../_images/016c65d8aa215432a7ad8deb6443416b263632ad6eb53b7efe597ef98da05abb.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>As one would expect, the training score is higher than the test score for all dataset sizes</p></li>
+<li><p>Training score of <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> with <code class="docutils literal notranslate"><span class="pre">alpha=0.01</span></code> &gt; Training score of <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> with <code class="docutils literal notranslate"><span class="pre">alpha=10</span></code> (more regularization)</p></li>
+<li><p>However, the test score of <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> with <code class="docutils literal notranslate"><span class="pre">alpha=10</span></code> &gt; Test score of <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> with <code class="docutils literal notranslate"><span class="pre">alpha=0.01</span></code> for smaller training sizes.</p></li>
+<li><p>As more and more data becomes available to the model, both models improve. Ridge with less regularization catches up with ridge with more regularization and actually performs better.</p></li>
+</ul>
+</section>
+<section id="how-to-pick-lambda">
+<h3>How to pick <span class="math notranslate nohighlight">\(\lambda\)</span>?<a class="headerlink" href="#how-to-pick-lambda" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Theory: as <span class="math notranslate nohighlight">\(n\)</span> grows <span class="math notranslate nohighlight">\(\lambda\)</span> should be in the range <span class="math notranslate nohighlight">\(O(1)\)</span> to <span class="math notranslate nohighlight">\(\sqrt{n}\)</span>.</p></li>
+<li><p>Practice: optimize validation set or cross-validation error.</p>
+<ul>
+<li><p>Almost always decreases the test error.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="optional-should-we-regularize-the-y-intercept">
+<h3>(Optional) Should we regularize the y-intercept?<a class="headerlink" href="#optional-should-we-regularize-the-y-intercept" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>No!</p>
+<ul>
+<li><p>Why encourage it to be closer to zero? (It could be anywhere.)</p></li>
+<li><p>You should be allowed to shift function up/down globally.</p></li>
+</ul>
+</li>
+<li><p>Yes!</p>
+<ul>
+<li><p>Useful for optimization; It makes the solution unique and it easier to compute <span class="math notranslate nohighlight">\(w\)</span></p></li>
+</ul>
+</li>
+<li><p>Compromise: regularize by a smaller amount than other variables.
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw + w_0 - y\rVert^2 + \frac{\lambda_1}{2}\lVert w\rVert^2 + \frac{\lambda_2}{2}w_0^2\)</span>$</p></li>
+</ul>
+</section>
+<section id="some-properties-of-l2-regularization">
+<h3>Some properties of L2-regularization<a class="headerlink" href="#some-properties-of-l2-regularization" title="Permalink to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Solution <span class="math notranslate nohighlight">\(w\)</span> is unique. It has to do with the smoothness of the function.</p>
+<ul class="simple">
+<li><p>We are not going into mathematical details. If interested see <a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L17.pdf">slide 20</a> from CPSC 340.</p></li>
+</ul>
+</li>
+<li><p><strong>Almost always improves the validation error.</strong></p></li>
+<li><p>No collinearity issues.</p></li>
+<li><p>Less sensitive to changes in <span class="math notranslate nohighlight">\(X\)</span>.</p></li>
+<li><p>Gradient descent (optimization algorithm) converges faster (bigger <span class="math notranslate nohighlight">\(\lambda\)</span> means fewer iterations). (You’ll learn about Grafient descent in 572.)</p></li>
+<li><p>Worst case: just set <span class="math notranslate nohighlight">\(\lambda\)</span> small and get the same performance</p></li>
+</ol>
+</section>
+<section id="summary-l2-regularization">
+<h3>Summary: L2-regularization<a class="headerlink" href="#summary-l2-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Change the loss function by adding a continuous L2-penalty on the model complexity.</p></li>
+<li><p>Best parameter <span class="math notranslate nohighlight">\(\lambda\)</span> almost already leads to improved validation error.</p>
+<ul>
+<li><p>L2-regularized least squares is also called “ridge regression”.</p></li>
+<li><p>Can be solved as a linear system like least squares.</p></li>
+</ul>
+</li>
+<li><p>Some benefits of L2 regularization</p>
+<ul>
+<li><p>Solution is unique.</p></li>
+<li><p>Less sensitive to data.</p></li>
+<li><p>Fast.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="questions-for-you-recap">
+<h2>❓❓ Questions for you (recap)<a class="headerlink" href="#questions-for-you-recap" title="Permalink to this heading">#</a></h2>
+<section id="iclicker-exercise-6-1">
+<h3>iClicker Exercise 6.1<a class="headerlink" href="#iclicker-exercise-6-1" title="Permalink to this heading">#</a></h3>
+<p><strong>iClicker cloud join link: https://join.iclicker.com/C0P55</strong></p>
+<p><strong>Select all of the following statements which are TRUE.</strong></p>
+<ul class="simple">
+<li><p>(A) Introducing L2 regularization to the model means making it less sensitive to changes in <span class="math notranslate nohighlight">\(X\)</span>.</p></li>
+<li><p>(B) Introducing L2 regularization to the model can results in worse performance on the training set.</p></li>
+<li><p>(C) L2 regularization shrinks the weights but all <span class="math notranslate nohighlight">\(w_j\)</span>s tend to be non-zero.</p></li>
+</ul>
+<p><strong>V’s answers: A, B, C</strong></p>
+</section>
+<section id="break-5-mins">
+<h3>Break (~5 mins)<a class="headerlink" href="#break-5-mins" title="Permalink to this heading">#</a></h3>
+<p><img alt="" src="_lectures/img/eva-coffee.png" /></p>
+</section>
+</section>
+<section id="l1-regularization">
+<h2>L1 regularization<a class="headerlink" href="#l1-regularization" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>An alternative to <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> (L2-regularization for least squares) is <code class="docutils literal notranslate"><span class="pre">Lasso</span></code>.</p></li>
+<li><p>Instead of L0- or L2-norm, regularize with L1-norm.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \sum_i^n(w^TX_i - y_i)^2 + \lambda\sum_j^d \lvert w_j \lvert\text{ or }\]</div>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_1\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lambda \rightarrow\)</span> regularization strength</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w\rVert_1 \rightarrow\)</span>  L1-norm of <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><p>Objective balances getting low error vs. having small values for <span class="math notranslate nohighlight">\(w_j\)</span></p></li>
+</ul>
+<section id="similarities-with-l2-regularization">
+<h3>Similarities with L2-regularization<a class="headerlink" href="#similarities-with-l2-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>L1-regularization
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_1\)</span>$</p></li>
+<li><p>L2-regularization
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_2^2\)</span>$</p></li>
+<li><p>Both shrink weights.</p></li>
+<li><p>Both result in lower validation error.</p></li>
+</ul>
+<p><strong>Do not confuse the L1 loss (absolute loss) with L1-regularization!</strong></p>
+</section>
+<section id="terminology-and-notation-ridge-and-lasso">
+<h3>Terminology and notation: Ridge and Lasso<a class="headerlink" href="#terminology-and-notation-ridge-and-lasso" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>Linear regression model that uses L2 regularization is called <strong>Ridge</strong> or Tikhonov regularization.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge"><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> Ridge</a></p></li>
+</ul>
+</li>
+<li><p>Linear regression model that uses L1 regularization is called <strong>Lasso</strong>.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html?highlight=lasso"><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> Lasso</a></p></li>
+</ul>
+<blockquote>
+<div><p>class sklearn.linear_model.Lasso(alpha=1.0, fit_intercept=True, normalize=False, precompute=False, copy_X=True, max_iter=1000, tol=0.0001, warm_start=False, positive=False, random_state=None, selection=’cyclic’)</p>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id1">
+<h3>L1-regularization<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The consequence of using L1-norm is that some features are exactly zero, which means that the features are entirely ignored by the model.</p></li>
+<li><p>This can be considered as a form of feature selection!!</p></li>
+<li><p>L1-regularization simultaneously regularizes and selects features.</p></li>
+<li><p>Very fast alternative to search and score methods</p></li>
+</ul>
+<p>Let’s apply <code class="docutils literal notranslate"><span class="pre">Lasso</span></code> on the California housing data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(15480, 44)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span>
+
+<span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of features used:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set score: 0.00
+Test set score: -0.00
+Number of features used: 0
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>That’s strange. It’s not using any features – like dummy model. It’s underfitting.</p></li>
+<li><p>Similar to <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> it also has a regularization hyperparameter <code class="docutils literal notranslate"><span class="pre">alpha</span></code>.</p></li>
+<li><p>Let’s decrease it to reduce underfitting.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Let’s examine weight shrinkage for l1 regularization</p></li>
+<li><p>Lasso loss is not a smooth function.</p></li>
+<li><p>Slower compared to Ridge.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">weight_shrinkage_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:[],</span> <span class="s1">&#39;||Xw - y||^2&#39;</span><span class="p">:[],</span> <span class="s1">&#39;||w||_1&#39;</span><span class="p">:[],</span> <span class="s1">&#39;intercept&#39;</span><span class="p">:[],</span> <span class="s1">&#39;train score&#39;</span><span class="p">:[],</span> <span class="s1">&#39;test score&#39;</span><span class="p">:[]}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphas</span><span class="p">):</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha: &#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span> 
+    <span class="n">l</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">OLS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">lr_loss_squared</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">l1_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">intercept_</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;||Xw - y||^2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OLS</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;||w||_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l1_term</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;intercept&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intercept</span><span class="p">)</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;train score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">weight_shrinkage_data</span><span class="p">[</span><span class="s1">&#39;test score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha:  0
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/b3/g26r0dcx4b35vf3nk31216hc0000gr/T/ipykernel_27748/2689048393.py:8: UserWarning: With alpha=0, this algorithm does not converge well. You are advised to use the LinearRegression estimator
+  l.fit(X_train, y_train)
+/Users/kvarada/opt/miniconda3/envs/573/lib/python3.10/site-packages/sklearn/linear_model/_coordinate_descent.py:648: UserWarning: Coordinate descent with no regularization may lead to unexpected results and is discouraged.
+  model = cd_fast.enet_coordinate_descent(
+/Users/kvarada/opt/miniconda3/envs/573/lib/python3.10/site-packages/sklearn/linear_model/_coordinate_descent.py:648: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 3.394e+03, tolerance: 2.066e+00 Linear regression models with null weight for the l1 regularization term are more efficiently fitted using one of the solvers implemented in sklearn.linear_model.Ridge/RidgeCV instead.
+  model = cd_fast.enet_coordinate_descent(
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha:  0.0001
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/kvarada/opt/miniconda3/envs/573/lib/python3.10/site-packages/sklearn/linear_model/_coordinate_descent.py:648: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.778e+03, tolerance: 2.066e+00
+  model = cd_fast.enet_coordinate_descent(
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha:  0.01
+alpha:  0.1
+alpha:  1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">weight_shrinkage_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>alpha</th>
+      <th>||Xw - y||^2</th>
+      <th>||w||_1</th>
+      <th>intercept</th>
+      <th>train score</th>
+      <th>test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0000</td>
+      <td>73398.6742</td>
+      <td>4.3674</td>
+      <td>2.0744</td>
+      <td>0.67</td>
+      <td>0.52</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0001</td>
+      <td>73462.0080</td>
+      <td>4.3674</td>
+      <td>2.0744</td>
+      <td>0.67</td>
+      <td>0.20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0100</td>
+      <td>74463.3147</td>
+      <td>4.3674</td>
+      <td>2.0744</td>
+      <td>0.62</td>
+      <td>0.33</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.1000</td>
+      <td>76723.2012</td>
+      <td>4.3674</td>
+      <td>2.0744</td>
+      <td>0.51</td>
+      <td>0.48</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0000</td>
+      <td>87271.1329</td>
+      <td>4.3674</td>
+      <td>2.0744</td>
+      <td>0.00</td>
+      <td>-0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of features used:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set score: 0.68
+Test set score: 0.62
+Number of features used: 44
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of features used:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set score: 0.51
+Test set score: 0.48
+Number of features used: 3
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>In this case we are not really getting better results with Lasso.</p></li>
+<li><p>In fact, Lasso is not able to do better than linear regression.</p></li>
+<li><p>Often you might see better scores than <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> with fewer features.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is too low, we reduce the effect of overfitting and the results are similar to linear regression.</p></li>
+</ul>
+</section>
+<section id="the-weights-become-smaller-and-eventually-become-zero">
+<h3>The weights become smaller and eventually become zero.<a class="headerlink" href="#the-weights-become-smaller-and-eventually-become-zero" title="Permalink to this heading">#</a></h3>
+<p>Let’s plot coefficients of <code class="docutils literal notranslate"><span class="pre">Lasso</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span><span class="s1">&#39;^&#39;</span><span class="p">]</span>
+<span class="n">lasso_models</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alphas</span><span class="p">):</span>
+    <span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+    <span class="n">lasso</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Lasso alpha=&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Coefficient index&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Coefficient magnitude&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>    
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/b3/g26r0dcx4b35vf3nk31216hc0000gr/T/ipykernel_27748/562400412.py:6: UserWarning: With alpha=0, this algorithm does not converge well. You are advised to use the LinearRegression estimator
+  lasso.fit(X_train, y_train)
+/Users/kvarada/opt/miniconda3/envs/573/lib/python3.10/site-packages/sklearn/linear_model/_coordinate_descent.py:648: UserWarning: Coordinate descent with no regularization may lead to unexpected results and is discouraged.
+  model = cd_fast.enet_coordinate_descent(
+/Users/kvarada/opt/miniconda3/envs/573/lib/python3.10/site-packages/sklearn/linear_model/_coordinate_descent.py:648: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 3.394e+03, tolerance: 2.066e+00 Linear regression models with null weight for the l1 regularization term are more efficiently fitted using one of the solvers implemented in sklearn.linear_model.Ridge/RidgeCV instead.
+  model = cd_fast.enet_coordinate_descent(
+</pre></div>
+</div>
+<img alt="../_images/97aeae6ab39d8fa5c77d468f9ff0a056222901ef551138b70be24f5ca721255b.png" src="../_images/97aeae6ab39d8fa5c77d468f9ff0a056222901ef551138b70be24f5ca721255b.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>For <code class="docutils literal notranslate"><span class="pre">alpha</span> <span class="pre">=</span> <span class="pre">100</span></code> most of the coefficients are zero.</p></li>
+<li><p>With smaller values of <code class="docutils literal notranslate"><span class="pre">alpha</span></code> we get less and less regularization.</p></li>
+</ul>
+<ul class="simple">
+<li><p>I’m not showing L1 regularization path on our data because it takes too long to run.</p></li>
+<li><p>But you’re likely to see this type of plots in the context of regularization.<br />
+<img alt="" src="_lectures/img/regularization_paths.png" /></p></li>
+</ul>
+<!-- <img src='img/regularization_paths.png' width="1000" height="1000" /> --></section>
+<section id="terminology-and-notation-sparsity">
+<h3>Terminology and notation: Sparsity<a class="headerlink" href="#terminology-and-notation-sparsity" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We say a linear function is sparse if most of the coefficients are zero.</p></li>
+<li><p>Example: Here only 2 out of 8 coefficients are non-zero and so it is a sparse function.
+$<span class="math notranslate nohighlight">\(0x_1 + 0.45 x_2 + 0  x_3 + 0x_4 + 1.2x_5 + 0x_6 + 0x_7 + 0x_8\)</span>$</p></li>
+<li><p>L0- and L1-regularization encourage sparsity.</p></li>
+</ul>
+</section>
+<section id="example-l0-vs-l1-vs-l2">
+<h3>Example: L0 vs. L1 vs. L2<a class="headerlink" href="#example-l0-vs-l1-vs-l2" title="Permalink to this heading">#</a></h3>
+<p>Consider problem where 3 vectors can get minimum training error:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix}100 \\0.02\end{bmatrix},  w^2 = \begin{bmatrix}100 \\0\end{bmatrix}, w^3 = \begin{bmatrix}99.99 \\0.02\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Without regularization, we could choose any of these 3.</p></li>
+<li><p>We are assuming that all have the same error, so regularization will “break tie”.</p></li>
+<li><p>Which one would you choose with each of L0, L1, L2 regularization?</p></li>
+</ul>
+</section>
+<section id="which-one-would-you-choose-with-l0-regularization">
+<h3>Which one would you choose with L0 regularization?<a class="headerlink" href="#which-one-would-you-choose-with-l0-regularization" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix}100 \\-0.02\end{bmatrix},  w^2 = \begin{bmatrix}100 \\0\end{bmatrix}, w^3 = \begin{bmatrix}99.99 \\0.02\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>What are the L0 norms of different weight vectors?</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^1\rVert_0 = 2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^2\rVert_0 = 1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^3\rVert_0 = 2\)</span>
+<br><br><br><br></p></li>
+</ul>
+</li>
+<li><p>L0 regularization would choose <span class="math notranslate nohighlight">\(w^2\)</span>.</p></li>
+</ul>
+</section>
+<section id="which-one-would-you-choose-with-l1-regularization">
+<h3>Which one would you choose with L1 regularization?<a class="headerlink" href="#which-one-would-you-choose-with-l1-regularization" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix}100 \\0.02\end{bmatrix},  w^2 = \begin{bmatrix}100 \\0\end{bmatrix}, w^3 = \begin{bmatrix}99.99 \\0.02\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>What are the L1 norms of different weight vectors?</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^1\rVert_1 = 100.02\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^2\rVert_1 = 100\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^3\rVert_1 = 100.01\)</span></p></li>
+</ul>
+</li>
+</ul>
+<p><br><br><br><br></p>
+<ul class="simple">
+<li><p>L1-regularization would pick <span class="math notranslate nohighlight">\(w^2\)</span></p></li>
+<li><p>L1-regularization focuses on decreasing all <span class="math notranslate nohighlight">\(w_j\)</span> until they are 0.</p></li>
+</ul>
+</section>
+<section id="which-one-would-you-choose-with-l2-regularization">
+<h3>Which one would you choose with L2 regularization?<a class="headerlink" href="#which-one-would-you-choose-with-l2-regularization" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix}100 \\0.02\end{bmatrix},  w^2 = \begin{bmatrix}100 \\0\end{bmatrix}, w^3 = \begin{bmatrix}99.99 \\0.02\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>What are the L2 norms of different weight vectors?</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^1\rVert_2^2 = (100)^2 + (0.02)^2 = 10000.0004\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^2\rVert_2^2 = (100)^2 = 10000\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^3\rVert_2^2 = (99.99)^2 + (0.02)^2 = 9998.0005\)</span></p></li>
+</ul>
+</li>
+</ul>
+<p><br><br><br><br></p>
+<ul class="simple">
+<li><p>L2-regularization would pick <span class="math notranslate nohighlight">\(w^3\)</span></p></li>
+<li><p>L2-regularization focuses on decreasing largest <span class="math notranslate nohighlight">\(w_j\)</span> smaller</p></li>
+</ul>
+</section>
+<section id="optional-sparsity-and-regularization">
+<h3>(Optional) Sparsity and Regularization<a class="headerlink" href="#optional-sparsity-and-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Minimizing <span class="math notranslate nohighlight">\(\lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_2^2\)</span> is equivalent to minimizing <span class="math notranslate nohighlight">\(\lVert Xw - y\rVert_2^2\)</span> subject to the constraint that <span class="math notranslate nohighlight">\(\lVert w\rVert_2^2 \leq t(\delta)\)</span></p></li>
+</ul>
+<p><img alt="" src="_lectures/img/regularization_sparsity1.png" /></p>
+<p><img alt="" src="_lectures/img/l1_l2_solution.png" /></p>
+<p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L17.pdf">Source</a></p>
+</section>
+<section id="sparsity-and-regularization-with-d-1">
+<h3>Sparsity and Regularization (with d=1)<a class="headerlink" href="#sparsity-and-regularization-with-d-1" title="Permalink to this heading">#</a></h3>
+<p><img alt="" src="_lectures/img/sparsity_regularization.png" /></p>
+<!-- <img src='img/sparsity_regularization.png' width="1000" height="1000" /> --><p><br><br></p>
+</section>
+<section id="some-properties-of-l1-regularization">
+<h3>Some properties of L1 regularization<a class="headerlink" href="#some-properties-of-l1-regularization" title="Permalink to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Almost always improves the validation error.</p></li>
+<li><p>Can learn with exponential number of irrelevant features.</p></li>
+<li><p>Less sensitive to changes in <span class="math notranslate nohighlight">\(X\)</span>.</p></li>
+<li><p>The solution is not unique. (If interested in more explanation on this, see slide 43 in <a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L18.pdf">this slide deck</a>.)</p></li>
+</ol>
+</section>
+<section id="feature-selection-using-l1-regularization">
+<h3>Feature selection using L1 regularization<a class="headerlink" href="#feature-selection-using-l1-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Feature selection methods we have seen so far:</p>
+<ul>
+<li><p>RFE</p></li>
+<li><p>Search and score with L0-regularization (e.g., forward search)</p></li>
+</ul>
+</li>
+<li><p>An effective way of feature selection: L1-regularization</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectFromModel</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">LassoCV</span>
+
+<span class="n">housing</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">housing</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">housing</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">pipe_l1_rf</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span>
+    <span class="n">StandardScaler</span><span class="p">(),</span>
+    <span class="n">SelectFromModel</span><span class="p">(</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">)),</span>
+    <span class="n">RandomForestRegressor</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(20640, 8)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe_l1_rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">pipe_l1_rf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.9731789734697873
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pipe_l1_rf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set score: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pipe_l1_rf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set score: 0.97
+Test set score: 0.79
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Number of features used:&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pipe_l1_rf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;selectfrommodel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of features used: 7
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="regularized-models-for-classification">
+<h2>Regularized models for classification<a class="headerlink" href="#regularized-models-for-classification" title="Permalink to this heading">#</a></h2>
+<section id="regularized-logistic-regression">
+<h3>Regularized logistic regression<a class="headerlink" href="#regularized-logistic-regression" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Regularization is not limited to least squares.</p></li>
+<li><p>We can add L1 and L2 penalty terms in other loss functions as well.</p></li>
+<li><p>Let’s look at logistic regression with L1- and L2-regularization.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="n">breast_cancer</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">()</span>
+<span class="c1"># print(breast_cancer.keys())</span>
+<span class="c1"># print(breast_cancer.DESCR)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">breast_cancer_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">breast_cancer</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">breast_cancer</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">breast_cancer_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">breast_cancer</span><span class="o">.</span><span class="n">target</span>
+<span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">breast_cancer_df</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]),</span> <span class="n">train_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]),</span> <span class="n">test_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean radius</th>
+      <th>mean texture</th>
+      <th>mean perimeter</th>
+      <th>mean area</th>
+      <th>mean smoothness</th>
+      <th>mean compactness</th>
+      <th>mean concavity</th>
+      <th>mean concave points</th>
+      <th>mean symmetry</th>
+      <th>mean fractal dimension</th>
+      <th>...</th>
+      <th>worst radius</th>
+      <th>worst texture</th>
+      <th>worst perimeter</th>
+      <th>worst area</th>
+      <th>worst smoothness</th>
+      <th>worst compactness</th>
+      <th>worst concavity</th>
+      <th>worst concave points</th>
+      <th>worst symmetry</th>
+      <th>worst fractal dimension</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>560</th>
+      <td>14.05</td>
+      <td>27.15</td>
+      <td>91.38</td>
+      <td>600.4</td>
+      <td>0.09929</td>
+      <td>0.11260</td>
+      <td>0.04462</td>
+      <td>0.04304</td>
+      <td>0.1537</td>
+      <td>0.06171</td>
+      <td>...</td>
+      <td>15.30</td>
+      <td>33.17</td>
+      <td>100.20</td>
+      <td>706.7</td>
+      <td>0.1241</td>
+      <td>0.22640</td>
+      <td>0.1326</td>
+      <td>0.10480</td>
+      <td>0.2250</td>
+      <td>0.08321</td>
+    </tr>
+    <tr>
+      <th>428</th>
+      <td>11.13</td>
+      <td>16.62</td>
+      <td>70.47</td>
+      <td>381.1</td>
+      <td>0.08151</td>
+      <td>0.03834</td>
+      <td>0.01369</td>
+      <td>0.01370</td>
+      <td>0.1511</td>
+      <td>0.06148</td>
+      <td>...</td>
+      <td>11.68</td>
+      <td>20.29</td>
+      <td>74.35</td>
+      <td>421.1</td>
+      <td>0.1030</td>
+      <td>0.06219</td>
+      <td>0.0458</td>
+      <td>0.04044</td>
+      <td>0.2383</td>
+      <td>0.07083</td>
+    </tr>
+    <tr>
+      <th>198</th>
+      <td>19.18</td>
+      <td>22.49</td>
+      <td>127.50</td>
+      <td>1148.0</td>
+      <td>0.08523</td>
+      <td>0.14280</td>
+      <td>0.11140</td>
+      <td>0.06772</td>
+      <td>0.1767</td>
+      <td>0.05529</td>
+      <td>...</td>
+      <td>23.36</td>
+      <td>32.06</td>
+      <td>166.40</td>
+      <td>1688.0</td>
+      <td>0.1322</td>
+      <td>0.56010</td>
+      <td>0.3865</td>
+      <td>0.17080</td>
+      <td>0.3193</td>
+      <td>0.09221</td>
+    </tr>
+    <tr>
+      <th>203</th>
+      <td>13.81</td>
+      <td>23.75</td>
+      <td>91.56</td>
+      <td>597.8</td>
+      <td>0.13230</td>
+      <td>0.17680</td>
+      <td>0.15580</td>
+      <td>0.09176</td>
+      <td>0.2251</td>
+      <td>0.07421</td>
+      <td>...</td>
+      <td>19.20</td>
+      <td>41.85</td>
+      <td>128.50</td>
+      <td>1153.0</td>
+      <td>0.2226</td>
+      <td>0.52090</td>
+      <td>0.4646</td>
+      <td>0.20130</td>
+      <td>0.4432</td>
+      <td>0.10860</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>10.95</td>
+      <td>21.35</td>
+      <td>71.90</td>
+      <td>371.1</td>
+      <td>0.12270</td>
+      <td>0.12180</td>
+      <td>0.10440</td>
+      <td>0.05669</td>
+      <td>0.1895</td>
+      <td>0.06870</td>
+      <td>...</td>
+      <td>12.84</td>
+      <td>35.34</td>
+      <td>87.22</td>
+      <td>514.0</td>
+      <td>0.1909</td>
+      <td>0.26980</td>
+      <td>0.4023</td>
+      <td>0.14240</td>
+      <td>0.2964</td>
+      <td>0.09606</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 30 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_train</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1    0.632967
+0    0.367033
+Name: target, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">make_scorer</span><span class="p">,</span> <span class="n">recall_score</span>
+
+<span class="n">custom_scorer</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span>
+    <span class="n">f1_score</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>  <span class="c1"># note the syntax to change the positive label for f1 score</span>
+<span class="n">scoring_metric</span> <span class="o">=</span> <span class="n">custom_scorer</span>
+
+<span class="n">results_classification</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s try <code class="docutils literal notranslate"><span class="pre">DummyClassifier</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dummy</span> <span class="o">=</span> <span class="n">DummyClassifier</span><span class="p">()</span>
+<span class="n">results_classification</span><span class="p">[</span><span class="s2">&quot;dummy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_std_cross_val_scores</span><span class="p">(</span>
+    <span class="n">dummy</span><span class="p">,</span>
+    <span class="n">X_train</span><span class="p">,</span>
+    <span class="n">y_train</span><span class="p">,</span>
+    <span class="n">return_train_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring_metric</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_classification</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dummy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>fit_time</th>
+      <td>0.000 (+/- 0.001)</td>
+    </tr>
+    <tr>
+      <th>score_time</th>
+      <td>0.000 (+/- 0.000)</td>
+    </tr>
+    <tr>
+      <th>test_score</th>
+      <td>0.000 (+/- 0.000)</td>
+    </tr>
+    <tr>
+      <th>train_score</th>
+      <td>0.000 (+/- 0.000)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>, by default logistic regression uses L2 regularization.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">C</span></code> hyperparameter decides the strength of regularization.</p></li>
+<li><p>Unfortunately, interpretation of <code class="docutils literal notranslate"><span class="pre">C</span></code> is inverse of <code class="docutils literal notranslate"><span class="pre">lambda</span></code>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe_lgr_l2</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">LogisticRegression</span><span class="p">())</span>
+<span class="n">results_classification</span><span class="p">[</span><span class="s2">&quot;Logistic Regression L2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_std_cross_val_scores</span><span class="p">(</span>
+    <span class="n">pipe_lgr_l2</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">return_train_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring_metric</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_classification</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dummy</th>
+      <th>Logistic Regression L2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>fit_time</th>
+      <td>0.000 (+/- 0.001)</td>
+      <td>0.005 (+/- 0.002)</td>
+    </tr>
+    <tr>
+      <th>score_time</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+    </tr>
+    <tr>
+      <th>test_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.970 (+/- 0.011)</td>
+    </tr>
+    <tr>
+      <th>train_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.985 (+/- 0.005)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Weights are small but all of them are non-zero.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe_lgr_l2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">l2_coefs</span> <span class="o">=</span> <span class="n">pipe_lgr_l2</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;logisticregression&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">l2_coefs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_train</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;l2_coefs&quot;</span><span class="p">])</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>l2_coefs</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mean radius</th>
+      <td>-0.539854</td>
+    </tr>
+    <tr>
+      <th>mean texture</th>
+      <td>-0.252141</td>
+    </tr>
+    <tr>
+      <th>mean perimeter</th>
+      <td>-0.494560</td>
+    </tr>
+    <tr>
+      <th>mean area</th>
+      <td>-0.610451</td>
+    </tr>
+    <tr>
+      <th>mean smoothness</th>
+      <td>-0.174066</td>
+    </tr>
+    <tr>
+      <th>mean compactness</th>
+      <td>0.577983</td>
+    </tr>
+    <tr>
+      <th>mean concavity</th>
+      <td>-0.658777</td>
+    </tr>
+    <tr>
+      <th>mean concave points</th>
+      <td>-0.980244</td>
+    </tr>
+    <tr>
+      <th>mean symmetry</th>
+      <td>0.119974</td>
+    </tr>
+    <tr>
+      <th>mean fractal dimension</th>
+      <td>0.406479</td>
+    </tr>
+    <tr>
+      <th>radius error</th>
+      <td>-1.247956</td>
+    </tr>
+    <tr>
+      <th>texture error</th>
+      <td>-0.103258</td>
+    </tr>
+    <tr>
+      <th>perimeter error</th>
+      <td>-0.731201</td>
+    </tr>
+    <tr>
+      <th>area error</th>
+      <td>-0.931584</td>
+    </tr>
+    <tr>
+      <th>smoothness error</th>
+      <td>-0.230991</td>
+    </tr>
+    <tr>
+      <th>compactness error</th>
+      <td>0.614317</td>
+    </tr>
+    <tr>
+      <th>concavity error</th>
+      <td>-0.032318</td>
+    </tr>
+    <tr>
+      <th>concave points error</th>
+      <td>-0.206376</td>
+    </tr>
+    <tr>
+      <th>symmetry error</th>
+      <td>0.272883</td>
+    </tr>
+    <tr>
+      <th>fractal dimension error</th>
+      <td>0.739561</td>
+    </tr>
+    <tr>
+      <th>worst radius</th>
+      <td>-1.040150</td>
+    </tr>
+    <tr>
+      <th>worst texture</th>
+      <td>-1.096207</td>
+    </tr>
+    <tr>
+      <th>worst perimeter</th>
+      <td>-0.885489</td>
+    </tr>
+    <tr>
+      <th>worst area</th>
+      <td>-1.026863</td>
+    </tr>
+    <tr>
+      <th>worst smoothness</th>
+      <td>-0.927290</td>
+    </tr>
+    <tr>
+      <th>worst compactness</th>
+      <td>-0.075403</td>
+    </tr>
+    <tr>
+      <th>worst concavity</th>
+      <td>-0.766568</td>
+    </tr>
+    <tr>
+      <th>worst concave points</th>
+      <td>-0.732966</td>
+    </tr>
+    <tr>
+      <th>worst symmetry</th>
+      <td>-0.669925</td>
+    </tr>
+    <tr>
+      <th>worst fractal dimension</th>
+      <td>-0.520939</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>Let’s try logistic regression with L1 regularization.</p></li>
+<li><p>Note that I’m using a different solver (optimizer) here because not all solvers support L1-regularization.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe_lgr_l1</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span>
+    <span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;liblinear&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="s2">&quot;l1&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">results_classification</span><span class="p">[</span><span class="s2">&quot;Logistic Regression L1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_std_cross_val_scores</span><span class="p">(</span>
+    <span class="n">pipe_lgr_l1</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">return_train_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring_metric</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_classification</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dummy</th>
+      <th>Logistic Regression L2</th>
+      <th>Logistic Regression L1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>fit_time</th>
+      <td>0.000 (+/- 0.001)</td>
+      <td>0.005 (+/- 0.002)</td>
+      <td>0.003 (+/- 0.001)</td>
+    </tr>
+    <tr>
+      <th>score_time</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+    </tr>
+    <tr>
+      <th>test_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.970 (+/- 0.011)</td>
+      <td>0.967 (+/- 0.007)</td>
+    </tr>
+    <tr>
+      <th>train_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.985 (+/- 0.005)</td>
+      <td>0.985 (+/- 0.005)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>The scores are more or less the same.</p></li>
+</ul>
+<ul class="simple">
+<li><p>But L1 regularization is carrying out feature selection; Many coefficients are 0.</p></li>
+<li><p>Similar scores with less features! More interpretable model!</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe_lgr_l1</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">l1_coefs</span> <span class="o">=</span> <span class="n">pipe_lgr_l1</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;logisticregression&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;l1_coef&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l1_coefs</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>l2_coefs</th>
+      <th>l1_coef</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mean radius</th>
+      <td>-0.539854</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean texture</th>
+      <td>-0.252141</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean perimeter</th>
+      <td>-0.494560</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean area</th>
+      <td>-0.610451</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean smoothness</th>
+      <td>-0.174066</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean compactness</th>
+      <td>0.577983</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean concavity</th>
+      <td>-0.658777</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean concave points</th>
+      <td>-0.980244</td>
+      <td>-1.337092</td>
+    </tr>
+    <tr>
+      <th>mean symmetry</th>
+      <td>0.119974</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>mean fractal dimension</th>
+      <td>0.406479</td>
+      <td>0.271158</td>
+    </tr>
+    <tr>
+      <th>radius error</th>
+      <td>-1.247956</td>
+      <td>-2.007079</td>
+    </tr>
+    <tr>
+      <th>texture error</th>
+      <td>-0.103258</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>perimeter error</th>
+      <td>-0.731201</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>area error</th>
+      <td>-0.931584</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>smoothness error</th>
+      <td>-0.230991</td>
+      <td>-0.127449</td>
+    </tr>
+    <tr>
+      <th>compactness error</th>
+      <td>0.614317</td>
+      <td>0.537477</td>
+    </tr>
+    <tr>
+      <th>concavity error</th>
+      <td>-0.032318</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>concave points error</th>
+      <td>-0.206376</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>symmetry error</th>
+      <td>0.272883</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>fractal dimension error</th>
+      <td>0.739561</td>
+      <td>0.227465</td>
+    </tr>
+    <tr>
+      <th>worst radius</th>
+      <td>-1.040150</td>
+      <td>-1.382266</td>
+    </tr>
+    <tr>
+      <th>worst texture</th>
+      <td>-1.096207</td>
+      <td>-1.372887</td>
+    </tr>
+    <tr>
+      <th>worst perimeter</th>
+      <td>-0.885489</td>
+      <td>-0.419092</td>
+    </tr>
+    <tr>
+      <th>worst area</th>
+      <td>-1.026863</td>
+      <td>-3.613997</td>
+    </tr>
+    <tr>
+      <th>worst smoothness</th>
+      <td>-0.927290</td>
+      <td>-0.984068</td>
+    </tr>
+    <tr>
+      <th>worst compactness</th>
+      <td>-0.075403</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>worst concavity</th>
+      <td>-0.766568</td>
+      <td>-1.011790</td>
+    </tr>
+    <tr>
+      <th>worst concave points</th>
+      <td>-0.732966</td>
+      <td>-0.660896</td>
+    </tr>
+    <tr>
+      <th>worst symmetry</th>
+      <td>-0.669925</td>
+      <td>-0.299326</td>
+    </tr>
+    <tr>
+      <th>worst fractal dimension</th>
+      <td>-0.520939</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We can also carry out feature selection using L1 regularization and pass selected features to another model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightgbm.sklearn</span> <span class="kn">import</span> <span class="n">LGBMClassifier</span>
+
+<span class="n">pipe_lgr_lgbm</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span>
+    <span class="n">StandardScaler</span><span class="p">(),</span>
+    <span class="n">SelectFromModel</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;liblinear&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="s2">&quot;l1&quot;</span><span class="p">)),</span>
+    <span class="n">LGBMClassifier</span><span class="p">(),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results_classification</span><span class="p">[</span><span class="s2">&quot;L1 + LGBM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_std_cross_val_scores</span><span class="p">(</span>
+    <span class="n">pipe_lgr_lgbm</span><span class="p">,</span>
+    <span class="n">X_train</span><span class="p">,</span>
+    <span class="n">y_train</span><span class="p">,</span>
+    <span class="n">return_train_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring_metric</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_classification</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dummy</th>
+      <th>Logistic Regression L2</th>
+      <th>Logistic Regression L1</th>
+      <th>L1 + LGBM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>fit_time</th>
+      <td>0.000 (+/- 0.001)</td>
+      <td>0.005 (+/- 0.002)</td>
+      <td>0.003 (+/- 0.001)</td>
+      <td>0.151 (+/- 0.015)</td>
+    </tr>
+    <tr>
+      <th>score_time</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+      <td>0.001 (+/- 0.000)</td>
+    </tr>
+    <tr>
+      <th>test_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.970 (+/- 0.011)</td>
+      <td>0.967 (+/- 0.007)</td>
+      <td>0.957 (+/- 0.034)</td>
+    </tr>
+    <tr>
+      <th>train_score</th>
+      <td>0.000 (+/- 0.000)</td>
+      <td>0.985 (+/- 0.005)</td>
+      <td>0.985 (+/- 0.005)</td>
+      <td>1.000 (+/- 0.000)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>The score went down a bit this case. But this might help in some other cases.</p></li>
+<li><p>The resulting model is using L1 selected features only.</p></li>
+</ul>
+</section>
+<section id="how-to-use-regularization-with-scikit-learn-some-examples">
+<h3>How to use regularization with <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>: some examples<a class="headerlink" href="#how-to-use-regularization-with-scikit-learn-some-examples" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>Regression</p>
+<ul class="simple">
+<li><p>Least squares with L2-regularization: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html">Ridge</a></p></li>
+<li><p>Least squares with L1-regularization: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html">Lasso</a></p></li>
+<li><p>Least squares with L1- and L2-regularization: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html">ElasticNet</a></p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR">SVR</a> (<span class="math notranslate nohighlight">\(\epsilon\)</span>-insensitive loss function)</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">epsilon</span> <span class="pre">=</span> <span class="pre">0</span></code> gives us <code class="docutils literal notranslate"><span class="pre">KernelRidge</span></code> model (least squares with RBF)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Classification</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html">SVC</a> (supports L2-regularization)</p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression">LogisticRegression</a> (support L1 and L2 with different solvers)</p></li>
+</ul>
+<blockquote>
+<div><p>penalty{‘l1’, ‘l2’, ‘elasticnet’, ‘none’}, default=’l2’ Used to specify the norm used in the penalization. The ‘newton-cg’, ‘sag’ and ‘lbfgs’ solvers support only l2 penalties. ‘elasticnet’ is only supported by the ‘saga’ solver. If ‘none’ (not supported by the liblinear solver), no regularization is applied.</p>
+</div></blockquote>
+</li>
+</ul>
+<p><br><br></p>
+<ul class="simple">
+<li><p>Interpretations of coefficients of regularized linear models should always be taken with a grain of salt.</p></li>
+<li><p>With different values of the regularization parameter, sometimes even the signs of the coefficients might change!!</p></li>
+</ul>
+<p><img alt="" src="_lectures/img/eva-qm.png" /></p>
+<p><br><br></p>
+</section>
+</section>
+<section id="regularization-scaling-and-collinearity">
+<h2>Regularization: scaling and collinearity<a class="headerlink" href="#regularization-scaling-and-collinearity" title="Permalink to this heading">#</a></h2>
+<section id="regularization-and-scaling">
+<h3>Regularization and scaling<a class="headerlink" href="#regularization-and-scaling" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>It doesn’t matter for decision trees or naive Bayes.</p>
+<ul>
+<li><p>They only look at one feature at a time.</p></li>
+</ul>
+</li>
+<li><p>It doesn’t matter for least squares:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w_j*(100 mL)\)</span> gives the same model as <span class="math notranslate nohighlight">\(w_j*(0.1 L)\)</span> with a different <span class="math notranslate nohighlight">\(w_j\)</span></p></li>
+</ul>
+</li>
+<li><p>It matters for <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours:</p>
+<ul>
+<li><p>Distance will be affected more by large features than small features.</p></li>
+</ul>
+</li>
+<li><p><strong>It matters for regularized least squares</strong>:</p>
+<ul>
+<li><p>Penalizing <span class="math notranslate nohighlight">\(w_j^2\)</span> means different things if features <span class="math notranslate nohighlight">\(j\)</span> are on different scales</p></li>
+<li><p>Penalizing <span class="math notranslate nohighlight">\(w_j\)</span> means different things if features <span class="math notranslate nohighlight">\(j\)</span> are on different scales</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="collinearity-and-regularization">
+<h3>Collinearity and regularization<a class="headerlink" href="#collinearity-and-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>If you have colinear features, the weights would go crazy with regular linear regression.</p></li>
+<li><p>With L2 regularization: The weight will be equally distributed among all collinear features because the solution is unique.</p>
+<ul>
+<li><p>Example: suppose we have three identical features with a total weight of 1</p></li>
+<li><p>The weight will be distributed as 1/3, 1/3, 1/3 among the features.</p></li>
+</ul>
+</li>
+<li><p>With L1 regularization: The weight will not be equally distributed; the solution is not unique.</p>
+<ul>
+<li><p>Example: suppose we have three identical features with a total weight of 1</p></li>
+<li><p>The weight could be distributed in many different ways</p></li>
+<li><p>For example, 1/2, 1/4, 1/4 or 1.0, 0, 0 or 1/2, 1/2, 0 and so on …</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="elastic-nets">
+<h3>Elastic nets<a class="headerlink" href="#elastic-nets" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Combine good properties from both worlds</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda(\alpha\lVert w\rVert_1 + (1-\alpha)\lVert w\rVert_2^2 )  \]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lambda\)</span> control the strength of regularization</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> controls the amount of sparsity and smoothness</p></li>
+<li><p>L1 promotes sparsity and the L2 promotes smoothness.</p></li>
+<li><p>The functional is strictly convex: the solution is unique.</p></li>
+<li><p>No collinearity problem</p>
+<ul>
+<li><p>A whole group of correlated variables is selected rather than just one variable in the group.</p></li>
+</ul>
+</li>
+</ul>
+<p>You can use elastic nets using sklearn’s <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html">ElasticNet</a>.</p>
+</section>
+</section>
+<section id="summary-l-regularization">
+<h2>Summary: L* regularization<a class="headerlink" href="#summary-l-regularization" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>L0-regularization (AIC, BIC, Mallow’s Cp, Adjusted R2, ANOVA): More on this is DSCi 562</p>
+<ul>
+<li><p>Adds penalty on the number of non-zeros to select features.</p></li>
+</ul>
+</li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda\lVert w\rVert_0\]</div>
+<ul class="simple">
+<li><p>L2-regularization (ridge regression):</p>
+<ul>
+<li><p>Adding penalty on the L2-norm of <span class="math notranslate nohighlight">\(w\)</span> to decrease overfitting:
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_2^2\)</span>$</p></li>
+</ul>
+</li>
+<li><p>L1-regularization (lasso regression):</p>
+<ul>
+<li><p>Adding penalty on the L1-norm decreases overfitting and selects features:
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_1\)</span>$</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>Interpretations of coefficients of linear models should always be taken with a grain of salt</p>
+<ul>
+<li><p>Regularizing a model might change the sign of the coefficients.</p></li>
+</ul>
+</li>
+<li><p>Un-regularized linear regression: not affected by scaling</p></li>
+<li><p>L1 or L2-regularized linear regression: both affected by scaling (and it’s usually a good idea)</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "571"
+        },
+        kernelOptions: {
+            name: "571",
+            path: "./_lectures"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = '571'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap">Recap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">Idea of regularization: Pick the line/hyperplane with smaller slope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-quantify-model-complexity">How to quantify model complexity?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l0-regularization">L0-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l2-regularization">L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sklearn-s-ridge-or-l2-regularization"><code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> or L2 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-l2-regularization-shrinking">Example: L2-Regularization “Shrinking”</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-weights-become-smaller-but-do-not-become-zero">The weights become smaller but do not become zero</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-path">Regularization path</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-learning-curves">Regularization learning curves</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-pick-lambda">How to pick <span class="math notranslate nohighlight">\(\lambda\)</span>?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-should-we-regularize-the-y-intercept">(Optional) Should we regularize the y-intercept?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#some-properties-of-l2-regularization">Some properties of L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-l2-regularization">Summary: L2-regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you-recap">❓❓ Questions for you (recap)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iclicker-exercise-6-1">iClicker Exercise 6.1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#break-5-mins">Break (~5 mins)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#l1-regularization">L1 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#similarities-with-l2-regularization">Similarities with L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation-ridge-and-lasso">Terminology and notation: Ridge and Lasso</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">L1-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-weights-become-smaller-and-eventually-become-zero">The weights become smaller and eventually become zero.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation-sparsity">Terminology and notation: Sparsity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-l0-vs-l1-vs-l2">Example: L0 vs. L1 vs. L2</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l0-regularization">Which one would you choose with L0 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l1-regularization">Which one would you choose with L1 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-one-would-you-choose-with-l2-regularization">Which one would you choose with L2 regularization?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-sparsity-and-regularization">(Optional) Sparsity and Regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-and-regularization-with-d-1">Sparsity and Regularization (with d=1)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#some-properties-of-l1-regularization">Some properties of L1 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-selection-using-l1-regularization">Feature selection using L1 regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularized-models-for-classification">Regularized models for classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularized-logistic-regression">Regularized logistic regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-regularization-with-scikit-learn-some-examples">How to use regularization with <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>: some examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-scaling-and-collinearity">Regularization: scaling and collinearity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-and-scaling">Regularization and scaling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collinearity-and-regularization">Collinearity and regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elastic-nets">Elastic nets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-l-regularization">Summary: L* regularization</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar and Joel Östblom
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,2576 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lecture 5: Loss functions, intro to regularization &#8212; DSCI 573 Feature and Model Selection</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/05_loss-functions-regularization_intro';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Lecture 6: L2- and L1-Regularization" href="06_L2-L1-regularization.html" />
+    <link rel="prev" title="Lecture 4: Feature importances and feature selection" href="04_feat-importances-selection.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_classification-metrics.html">Lecture 1: Classification metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_regression-metrics.html">Lecture 2: Regression metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_feature-engineering.html">Lecture 3: Feature engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_feat-importances-selection.html">Lecture 4: Feature importances and feature selection</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lecture 5: Loss functions, intro to regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_L2-L1-regularization.html">Lecture 6: L2- and L1-Regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_ensembles.html">Lecture 7: Ensembles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_model-transparency-conclusion.html">Lecture 8: Model transparency and conclusion</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lectures/05_loss-functions-regularization_intro.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lecture 5: Loss functions, intro to regularization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions-big-picture">Loss functions: big picture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-model">Choosing your model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-loss-function">Choosing your loss function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-optimization-algorithm">Choosing your optimization algorithm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-regression-loss-function">Linear regression loss function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinary-least-squares">Ordinary least squares</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-with-ols">Learning with OLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-value-loss">Absolute value loss</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions-in-classification-problems">Loss functions in classification problems</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-about-using-ols-for-binary-classification">How about using OLS for binary classification?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-should-be-the-loss-activity-4-mins">What should be the loss? (Activity: 4 mins)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-do-we-want">What do we want?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-idea">Key idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loss">0/1 loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preferences">Preferences</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponential-loss">Exponential loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition">Intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hinge-loss">Hinge Loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss-logloss">Logistic loss (logloss)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sigmoid-vs-logistic-loss">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-another-source-of-confusion">(Optional) Another source of confusion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-the-key-difference-between-them">(Optional) The key difference between them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-loss-function-should-i-use">Which loss function should I use?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#break-5-mins">Break (~5 mins)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-motivation-and-notation">Regularization: Motivation and notation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-models-and-the-fundamental-tradeoff">Complex models and the fundamental tradeoff</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#controlling-model-complexity">Controlling model complexity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-intuition">Regularization intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-quantify-model-complexity">How to quantify model complexity?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation">Terminology and notation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reminder-l0-l1-and-l2-norms">Reminder: L0, L1, and L2 norms</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-vectorization">(Optional) Vectorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity-penalties-and-l0-regularization">Complexity penalties and L0 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-selection-complexity-penalty">Model selection: complexity penalty</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity-penalty">Complexity penalty</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizing-this-score">Optimizing this score</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-model-selection">(Optional) Model selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#remember-the-search-and-score-methods-for-feature-selection">Remember the search and score methods for feature selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scoring-using-complexity-penalties">Scoring using complexity penalties</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l0-norm-and-the-number-of-features-used"><span class="math notranslate nohighlight">\(L0\)</span> “norm”  and the number of features used</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scoring-using-l0-norm">Scoring using <span class="math notranslate nohighlight">\(L0\)</span> “norm”</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#l2-regularization">L2 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">Idea of regularization: Pick the line/hyperplane with smaller slope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">L2 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-demo">Regularization demo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-1-use-a-lower-degree-polynomial">Solution 1: Use a lower degree polynomial</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-2-use-regularization">Solution 2: Use regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-are-small-weights-better">Why are small weights better?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#have-we-seen-l2-regularization-before">Have we seen L2 regularization before?</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-what-did-we-learn-today">Summary: What did we learn today?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-1-l0-and-l2-regularization">Exercise 5.1 L0 and L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-2">Exercise 5.2</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <p><img alt="" src="../_images/573_banner.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lecture-5-loss-functions-intro-to-regularization">
+<h1>Lecture 5: Loss functions, intro to regularization<a class="headerlink" href="#lecture-5-loss-functions-intro-to-regularization" title="Permalink to this heading">#</a></h1>
+<p>UBC Master of Data Science program, 2022-23</p>
+<p>Instructor: Varada Kolhatkar</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;code/.&quot;</span><span class="p">)</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">mglearn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">npr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">plotting_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span><span class="p">,</span> <span class="n">DummyRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">RidgeCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">cross_validate</span><span class="p">,</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">StandardScaler</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_colwidth&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="learning-outcomes">
+<h3>Learning outcomes<a class="headerlink" href="#learning-outcomes" title="Permalink to this heading">#</a></h3>
+<p>From this lecture, students are expected to be able to:</p>
+<ul class="simple">
+<li><p>State the three important steps in supervised machine learning.</p></li>
+<li><p>Broadly explain the concept of loss functions.</p></li>
+<li><p>State the loss function of linear regression.</p></li>
+<li><p>Broadly explain the effect of using ordinary least squares vs. absolute value loss function.</p></li>
+<li><p>Explain why ordinary least squares is not a suitable loss function for classification problems.</p></li>
+<li><p>Explain the trick of using <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> when defining loss functions for classification problems.</p></li>
+<li><p>Broadly explain the intuition behind 1/0, exponential, hinge and logistic loss.</p></li>
+<li><p>Explain the difference between sigmoid and logistic loss.</p></li>
+<li><p>Explain the general idea of complexity penalties.</p></li>
+<li><p>Relate feature selection to the idea of complexity penalty.</p></li>
+<li><p>Explain the general idea of L0 and L2 regularization.</p></li>
+</ul>
+</section>
+</section>
+<section id="loss-functions-big-picture">
+<h2>Loss functions: big picture<a class="headerlink" href="#loss-functions-big-picture" title="Permalink to this heading">#</a></h2>
+<p>In DSCI 571, we primarily focused on how <code class="docutils literal notranslate"><span class="pre">predict</span></code> works. In this lecture, we’ll talk a bit about how <code class="docutils literal notranslate"><span class="pre">fit</span></code> works, primarily in the context of linear models.</p>
+<p>In supervised machine learning we learn a mapping function which relates <code class="docutils literal notranslate"><span class="pre">X</span></code> to <code class="docutils literal notranslate"><span class="pre">y</span></code>. How do we learn this function?</p>
+<p>We can start to think of (a lot of) ML as a 3-step process:</p>
+<ol class="arabic simple">
+<li><p>Choose your <strong>model</strong></p></li>
+<li><p>Choose your <strong>loss function</strong></p></li>
+<li><p>Choose your <strong>optimization algorithm</strong></p></li>
+</ol>
+<!-- ![](img/supervised-ML-fit-process.png) -->
+<a class="reference internal image-reference" href="../_images/supervised-ML-fit-process.png"><img alt="../_images/supervised-ML-fit-process.png" src="../_images/supervised-ML-fit-process.png" style="width: 500px;" /></a>
+<section id="choosing-your-model">
+<h3>Choosing your model<a class="headerlink" href="#choosing-your-model" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>What kind of mapping function do you want to learn?</p></li>
+<li><p>Suppose we decide to go with a linear model. Then the possible mapping functions to choose from are only going to be linear functions.</p>
+<ul>
+<li><p>Example: <span class="math notranslate nohighlight">\(\hat{y}=5x_1+ 2x_2 - x_3\)</span> or <span class="math notranslate nohighlight">\(\hat{y}=10x_1+2x_2\)</span></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="choosing-your-loss-function">
+<h3>Choosing your loss function<a class="headerlink" href="#choosing-your-loss-function" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We define a criteria to quantify how bad the model’s prediction is in comparison to the truth. This is called a <strong>loss function</strong> usually denoted as: <span class="math notranslate nohighlight">\(\mathcal{l}(y, \hat{y})\)</span>.</p></li>
+<li><p>Examples:</p>
+<ul>
+<li><p>Binary classification: <span class="math notranslate nohighlight">\(\mathcal{l}(y, \hat{y}) = \begin{cases} 0 \text{ if } y = \hat{y} \\ 1, \text{otherwise}\end{cases}\)</span></p></li>
+<li><p>Regression: <span class="math notranslate nohighlight">\(\mathcal{l}(y, \hat{y}) = (y-\hat{y})^2\)</span></p></li>
+</ul>
+</li>
+<li><p>Quantifies unhappiness of the fit across the training data.</p></li>
+<li><p>Captures what is important to learn.</p></li>
+<li><p>Using our loss function and our training data, we can examine which model function is better</p>
+<ul>
+<li><p>Example: Which linear function is better for the given problem: <span class="math notranslate nohighlight">\(\hat{y}=5x_1+ 2x_2 - x_3\)</span> or <span class="math notranslate nohighlight">\(\hat{y}=10x_1+2x_2\)</span>?</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="choosing-your-optimization-algorithm">
+<h3>Choosing your optimization algorithm<a class="headerlink" href="#choosing-your-optimization-algorithm" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Our goal is finding the optimal parameters so that the model’s predictions are  least bad compared to the truth.</p></li>
+<li><p>The optimization algorithm computationally finds the minimum of the loss function.</p></li>
+<li><p>More on this in DSCI 572.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="linear-regression-loss-function">
+<h2>Linear regression loss function<a class="headerlink" href="#linear-regression-loss-function" title="Permalink to this heading">#</a></h2>
+<p>In the context of linear regression, when we call <code class="docutils literal notranslate"><span class="pre">fit</span></code>, a hyperplane is learned by the model. Let’s look at a toy example.</p>
+<p>Consider this toy regression dataset with only one feature.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span> <span class="o">=</span> <span class="n">gen_outlier_data</span><span class="p">()</span> <span class="c1"># user-defined function in plotting_functions.py</span>
+<span class="n">plot_reg</span><span class="p">(</span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">)</span> <span class="c1"># user-defined function in plotting_functions.py</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/bcd9a411bf44b5330bba86f1abde305fae72fd6c63d9240ec1a551acf27197ba.png" src="../_images/bcd9a411bf44b5330bba86f1abde305fae72fd6c63d9240ec1a551acf27197ba.png" />
+</div>
+</div>
+<p>Let’s train <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> and get the regression line.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">)</span>
+<span class="n">plot_reg</span><span class="p">(</span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">,</span> <span class="n">preds</span><span class="o">=</span><span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_toy</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ed900f7960e50e1eb1d723b877622cd38cef50451ea405f6654c78f87d9eaf41.png" src="../_images/ed900f7960e50e1eb1d723b877622cd38cef50451ea405f6654c78f87d9eaf41.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>There could be many possible lines.</p></li>
+<li><p>Why did linear regression pick this particular line?</p></li>
+<li><p>Is this the “best” possible line?</p></li>
+</ul>
+<section id="ordinary-least-squares">
+<h3>Ordinary least squares<a class="headerlink" href="#ordinary-least-squares" title="Permalink to this heading">#</a></h3>
+<p>Linear regression selected the above line by <strong>minimizing the quadratic cost between the actual target <span class="math notranslate nohighlight">\(y\)</span> and the model predictions <span class="math notranslate nohighlight">\(\hat{y}\)</span></strong>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{equation}
+\begin{split}
+J(w) &amp;= \sum_{i=1}^n (y_i - w^Tx_i)^2 \\
+\end{split}
+\end{equation}
+\end{split}\]</div>
+<ul class="simple">
+<li><p>Where,</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(n \rightarrow\)</span> number of examples</p></li>
+<li><p><span class="math notranslate nohighlight">\(w \rightarrow\)</span> weight vector (column vector)</p></li>
+</ul>
+</li>
+<li><p>This is called <strong>ordinary least squares (OLS)</strong>, the most commonly used <strong>loss function</strong> or <strong>cost function</strong> for linear regression.</p></li>
+<li><p>We define loss of a single example as squared difference between prediction and true target.</p></li>
+<li><p>The total loss is summation of losses over all training examples.</p></li>
+</ul>
+<p><em>Note: In this course all vectors are assumed to be column vectors.</em></p>
+</section>
+<section id="learning-with-ols">
+<h3>Learning with OLS<a class="headerlink" href="#learning-with-ols" title="Permalink to this heading">#</a></h3>
+<p>Among all possible lines, it will decide the “best” line by learning parameters <span class="math notranslate nohighlight">\(w\)</span> which make predictions for each training example as close as possible to the true <span class="math notranslate nohighlight">\(y\)</span> according to the loss function.</p>
+<p>So once you decide what kind of model you are going to train, you can think of <code class="docutils literal notranslate"><span class="pre">fit</span></code> as a two-step process.</p>
+<ul class="simple">
+<li><p>We need two things:</p>
+<ul>
+<li><p><strong>Loss function</strong>: A metric to measure how much a prediction differs from the true <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+<li><p><strong>Optimization algorithm</strong>: for iteratively updating the weights so as to minimize the loss function. (You’ll talk about this in detail in 572.)</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>In 1D (only one feature in X), we will be learning two parameters: <span class="math notranslate nohighlight">\(w_1\)</span> and <span class="math notranslate nohighlight">\(w_2\)</span> (<span class="math notranslate nohighlight">\(\beta_1, \beta_2\)</span> in the picture below)</p></li>
+<li><p>Our loss function will look like a bowl.</p></li>
+<li><p>The contour plot projected on 2D looks like ellipses.</p></li>
+<li><p>(Optional) For a well-defined ordinary least squares, there is a unique solution and it can be calculated analytically.
+$<span class="math notranslate nohighlight">\(w_{OLS}= (X^TX)^{-1}X^Ty\)</span>$</p></li>
+</ul>
+<p><img alt="" src="../_images/OLS_loss_function.png" />
+Source: https://www.statlearning.com/</p>
+<p>Let’s experiment with different loss functions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lr_loss_squared</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="c1"># define OLS loss function</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">w</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s use an optimizer from <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> and get the learned parameters.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span> <span class="c1"># scipy optimizer </span>
+<span class="n">X_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_toy</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">X_toy</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Create a column of ones</span>
+<span class="n">w_min</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">lr_loss_squared</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">X_1</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">))</span><span class="o">.</span><span class="n">x</span> <span class="c1"># minimize the loss function defined above using an optimizer </span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scipy.optimize weights: &quot;</span><span class="p">,</span> <span class="n">w_min</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scipy.optimize intercept: &quot;</span><span class="p">,</span> <span class="n">w_min</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scipy.optimize weights:  16.342238893263442
+scipy.optimize intercept:  -6.017153240936053
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># user-defined function in plotting_functions.py</span>
+<span class="n">compare_regression_lines</span><span class="p">(</span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_toy</span><span class="p">),</span> <span class="n">X_1</span><span class="nd">@w_min</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/af59db065ea80d6537b4b8d7a86c13cdb2974e745dde5f7daa07156e6458fdce.png" src="../_images/af59db065ea80d6537b4b8d7a86c13cdb2974e745dde5f7daa07156e6458fdce.png" />
+</div>
+</div>
+<p>The sklearn OLS line and our OLS line are exactly the same!</p>
+<ul class="simple">
+<li><p>Squared error loss penalizes really heavily for big errors compared to the absolute loss.</p></li>
+<li><p>If you have a data point with a big error, the loss function is going to focus a lot on it as the penalty is very high for this this data point.</p></li>
+</ul>
+</section>
+<section id="absolute-value-loss">
+<h3>Absolute value loss<a class="headerlink" href="#absolute-value-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>An example of a different loss function would be the <strong>absolute value loss</strong> where we do not punish large errors as severely as ordinary least squares.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[J(w) = \sum_{i=1}^n \lvert y_i - w^Tx_i\lvert\]</div>
+<ul class="simple">
+<li><p>What are the implications of switching between these different choices?</p></li>
+<li><p>Let’s try it out.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lr_loss_abs</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">w</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_min_abs</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span>
+    <span class="n">lr_loss_abs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">X_1</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">x</span>  <span class="c1"># don&#39;t try this at home</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_regression_lines</span><span class="p">(</span><span class="n">X_toy</span><span class="p">,</span> <span class="n">y_toy</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_toy</span><span class="p">),</span> <span class="n">X_1</span><span class="nd">@w_min_abs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/fc913e1f66a249886c71f79e64f1bd650825072b2e36bcb39f1777c7b57f702c.png" src="../_images/fc913e1f66a249886c71f79e64f1bd650825072b2e36bcb39f1777c7b57f702c.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>So, it seems like we got very different fits by changing the loss function.</p></li>
+<li><p>In this case, the absolute loss gave us robust regression.</p></li>
+<li><p><strong>The loss function you pick is important!</strong></p></li>
+</ul>
+<p>Note: You will talk about robust regression in DSCI 561/562 and you’ll learn the maximum likelihood interpretation of the loss in DSCI 562.</p>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="loss-functions-in-classification-problems">
+<h2>Loss functions in classification problems<a class="headerlink" href="#loss-functions-in-classification-problems" title="Permalink to this heading">#</a></h2>
+<section id="how-about-using-ols-for-binary-classification">
+<h3>How about using OLS for binary classification?<a class="headerlink" href="#how-about-using-ols-for-binary-classification" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Let’s assume binary classification with two classes: +1 and -1.</p></li>
+<li><p>So <span class="math notranslate nohighlight">\(y_i\)</span> values are just +1 or -1.</p></li>
+<li><p>The raw model output <span class="math notranslate nohighlight">\(w^Tx_i\)</span> can be any number.</p></li>
+<li><p>Does it make sense to use this loss function for binary classification?</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w)=\sum_{i=1}^n (y_i - w^Tx_i)^2\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
+<span class="n">X_classif</span><span class="p">,</span> <span class="n">y_classif</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_redundant</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">y_classif</span><span class="p">[</span><span class="n">y_classif</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X_classif</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_classif</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y_classif</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;Class -1&quot;</span><span class="p">,</span> <span class="s2">&quot;Class 1&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9bf28ab2f9a363883bd6011f94db9f8449e030ab635385039fbe4574e641ecdc.png" src="../_images/9bf28ab2f9a363883bd6011f94db9f8449e030ab635385039fbe4574e641ecdc.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logreg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">logreg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_classif</span><span class="p">,</span> <span class="n">y_classif</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LogisticRegression()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression()</pre></div></div></div></div></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X_classif</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_classif</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y_classif</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;Class -1&quot;</span><span class="p">,</span> <span class="s2">&quot;Class 1&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">plot_2d_separator</span><span class="p">(</span>
+    <span class="n">logreg</span><span class="p">,</span> <span class="n">X_classif</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="n">point1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.48458573</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15474787</span><span class="p">]</span>
+<span class="n">point2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.22636803</span><span class="p">,</span>  <span class="mf">1.41418926</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;point1&quot;</span><span class="p">,</span> <span class="n">point1</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.4</span><span class="p">,</span><span class="n">point1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;point2&quot;</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="p">[</span><span class="n">point2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">point2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/26b0ff5dc86dd3599352c75d854eda748439dba4b9410e7fafca95d55210d90c.png" src="../_images/26b0ff5dc86dd3599352c75d854eda748439dba4b9410e7fafca95d55210d90c.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>The model seems to be correct and confident about point1.</p></li>
+<li><p>The model seems to be incorrect about point2</p></li>
+<li><p>Should the loss for point1 be higher or lower than point2?</p></li>
+<li><p>Let’s calculate least square losses for these points.</p></li>
+</ul>
+<p>For point1, the correct prediction <span class="math notranslate nohighlight">\(y_i\)</span> is 1. So <span class="math notranslate nohighlight">\((y_i - w^Tx_i)^2\)</span> will be</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">logreg</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="nd">@point1</span> <span class="o">+</span> <span class="n">logreg</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([4.82807419])
+</pre></div>
+</div>
+</div>
+</div>
+<p>For point2, the correct prediction <span class="math notranslate nohighlight">\(y_i\)</span> is again 1. So <span class="math notranslate nohighlight">\((y_i - w^Tx_i)^2\)</span> will be</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">logreg</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="nd">@point2</span> <span class="o">+</span> <span class="n">logreg</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([2.33661675])
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Does it make sense?</p></li>
+<li><p>Is this loss function capturing what we want it to capture?</p></li>
+</ul>
+<p><br><br></p>
+</section>
+<section id="what-should-be-the-loss-activity-4-mins">
+<h3>What should be the loss? (Activity: 4 mins)<a class="headerlink" href="#what-should-be-the-loss-activity-4-mins" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Consider the following made-up classification example where target (true <code class="docutils literal notranslate"><span class="pre">y</span></code>) is binary: -1 or 1.</p></li>
+<li><p>The true <span class="math notranslate nohighlight">\(y\)</span> (<code class="docutils literal notranslate"><span class="pre">y_true</span></code>) and models raw scores (<span class="math notranslate nohighlight">\(w^Tx_i\)</span>) are given to you.</p></li>
+<li><p>You want to figure out how do you want to punish the mistakes made by the current model.</p></li>
+<li><p>How will you punish the model in each case?</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;y_true&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s2">&quot;raw score ($w^Tx_i$)&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">],</span>
+    <span class="s2">&quot;correct? (yes/no)&quot;</span><span class="p">:[</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;confident/hesitant?&quot;</span><span class="p">:[</span><span class="s2">&quot;confident&quot;</span><span class="p">,</span> <span class="s2">&quot;hesitant&quot;</span><span class="p">,</span> <span class="s2">&quot;hesitant&quot;</span><span class="p">,</span> <span class="s2">&quot;confindent&quot;</span><span class="p">,</span> <span class="s2">&quot;confident&quot;</span><span class="p">,</span> <span class="s2">&quot;hesistant&quot;</span><span class="p">,</span> <span class="s2">&quot;hesitant&quot;</span><span class="p">,</span> <span class="s2">&quot;confident&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;punishment&quot;</span><span class="p">:[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;small punishment&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y_true</th>
+      <th>raw score ($w^Tx_i$)</th>
+      <th>correct? (yes/no)</th>
+      <th>confident/hesitant?</th>
+      <th>punishment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>10.00</td>
+      <td>yes</td>
+      <td>confident</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.51</td>
+      <td>yes</td>
+      <td>hesitant</td>
+      <td>small punishment</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>-0.10</td>
+      <td>no</td>
+      <td>hesitant</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>-10.00</td>
+      <td>no</td>
+      <td>confindent</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-1</td>
+      <td>-12.00</td>
+      <td>yes</td>
+      <td>confident</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-1</td>
+      <td>-1.00</td>
+      <td>yes</td>
+      <td>hesistant</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-1</td>
+      <td>0.40</td>
+      <td>no</td>
+      <td>hesitant</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-1</td>
+      <td>18.00</td>
+      <td>no</td>
+      <td>confident</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="what-do-we-want">
+<h3>What do we want?<a class="headerlink" href="#what-do-we-want" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Need a loss that encourages</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> to be positive when <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(+1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> to be negative when <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(-1\)</span></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="key-idea">
+<h3>Key idea<a class="headerlink" href="#key-idea" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Consider the product <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span></strong>.</p></li>
+<li><p>We always want this quantity to be positive because</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(y_i\)</span> and <span class="math notranslate nohighlight">\(w^Tx_i\)</span> have the <em>same sign</em>, the product will be positive.</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is positive and <span class="math notranslate nohighlight">\(y_i\)</span> is positive 🙂</p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is negative and <span class="math notranslate nohighlight">\(y_i\)</span> is negative 🙂</p></li>
+</ul>
+</li>
+<li><p>If they have <em>oppositve signs</em>, the product will be negative.</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is positive and <span class="math notranslate nohighlight">\(y_i\)</span> is negative 😔</p></li>
+<li><p><span class="math notranslate nohighlight">\(w^Tx_i\)</span> is negative and <span class="math notranslate nohighlight">\(y_i\)</span> is positive 😔</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>We’ll see this type of plots, where we plot <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> vs. the loss <span class="math notranslate nohighlight">\(f_i(w)\)</span> for point <span class="math notranslate nohighlight">\(x_i\)</span>.</p></li>
+<li><p>Shows loss for one example.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_loss_diagram</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/da60d86999d85b03d39af21dc445401a77509facb435278f2f063491b96b11fa.png" src="../_images/da60d86999d85b03d39af21dc445401a77509facb435278f2f063491b96b11fa.png" />
+</div>
+</div>
+</section>
+<section id="loss">
+<h3>0/1 loss<a class="headerlink" href="#loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Binary state of happiness.</p></li>
+<li><p>We are happy (loss=0) when the <span class="math notranslate nohighlight">\(y_iw^Tx_i \geq 0\)</span>
+$<span class="math notranslate nohighlight">\(y_iw^Tx_i \geq 0, f_i(w) = 0\)</span>$</p></li>
+<li><p>We are unhappy (loss=1) when <span class="math notranslate nohighlight">\(y_iw^Tx_i &lt; 0\)</span>
+$<span class="math notranslate nohighlight">\(y_iw^Tx_i &lt; 0, f_i(w) = 1\)</span>$</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plot_loss_diagram</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0-1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/711b657d679ecde947b166f68c06dd02a53dcb36d8272e7d2c60311a032f0d09.png" src="../_images/711b657d679ecde947b166f68c06dd02a53dcb36d8272e7d2c60311a032f0d09.png" />
+</div>
+</div>
+</section>
+<section id="preferences">
+<h3>Preferences<a class="headerlink" href="#preferences" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>In 0/1 loss we are giving the same penalty to the examples where we are only slightly incorrect vs very incorrect.</p></li>
+<li><p>It might be nice to have some preferences: <br></p>
+<ul>
+<li><p><span style="color:green"><strong>correct and confident</strong></span> (positive value with big magnitude of <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span>) <br> <strong>&gt;</strong> <span style="color:cyan"> <strong>correct and hesitant</strong> </span>  (positive value with small magnitude of <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span>) <br> <strong>&gt;</strong> <span style="color:orange"><strong>incorrect and hesitant</strong></span> (negative value with small magnitude of <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span>) <br> <strong>&gt;</strong>  <span style="color:red"><strong>incorrect and confident</strong></span> (negative value with big magnitude of <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span>)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="exponential-loss">
+<h3>Exponential loss<a class="headerlink" href="#exponential-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Punish the wrong predictions exponentially.
+$<span class="math notranslate nohighlight">\(\exp(-y_iw^Tx_i)\)</span>$</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_loss_diagram</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0-1&quot;</span><span class="p">)</span> <span class="c1"># 0-1 loss</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">grid</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;exponential&quot;</span><span class="p">)</span> <span class="c1"># exponential loss</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/dfe872a3bdee0e98b6cb98a77a4955bca93629dc8f7bfd4ff78c6dcf3355bf2a.png" src="../_images/dfe872a3bdee0e98b6cb98a77a4955bca93629dc8f7bfd4ff78c6dcf3355bf2a.png" />
+</div>
+</div>
+</section>
+<section id="intuition">
+<h3>Intuition<a class="headerlink" href="#intuition" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The function gets smaller as <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> gets larger, so it encourages correct classification.</p></li>
+<li><p>So if we minimize this loss, which means if we move down and to the right, it is encouraging positive values and hence correct predictions.</p></li>
+</ul>
+</section>
+<section id="hinge-loss">
+<h3>Hinge Loss<a class="headerlink" href="#hinge-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Confident and correct examples are not penalized</p></li>
+<li><p>Grows linearly for negative values in a linear fashion.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[max(0, 1 - y_iw^Tx_i)\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_loss_diagram</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0-1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">grid</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;exponential&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">grid</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;hinge&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c8ab41084732e24a784ba03e942b60c9f8a5cd540cb7de109131ad3a5655cba8.png" src="../_images/c8ab41084732e24a784ba03e942b60c9f8a5cd540cb7de109131ad3a5655cba8.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>When you use Hinge loss with L2 regularization (coming up), it’s called a linear support vector machine.<br />
+$<span class="math notranslate nohighlight">\(f(w) = \sum_{i=1}^n max\{0,1-y_iw^Tx_i\} + \frac{\lambda}{2} \lVert w\rVert_2^2\)</span>$</p></li>
+<li><p>For more mathematical details on these topics see the following slide decks from CPSC 340.</p>
+<ul>
+<li><p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L20.pdf">Linear classifiers</a></p></li>
+<li><p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L19.pdf">More on linear classifiers</a></p></li>
+</ul>
+</li>
+<li><p>It will make more sense when you learn about optimization in DSCI 572.</p></li>
+</ul>
+</section>
+<section id="logistic-loss-logloss">
+<h3>Logistic loss (logloss)<a class="headerlink" href="#logistic-loss-logloss" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>Used in logistic regression</p></li>
+<li><p>Grows linearly for negative values which makes it less sensitive to outliers.</p>
+<div class="math notranslate nohighlight">
+\[\log\left(1+\exp(-y_iw^Tx_i)\right)\]</div>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_loss_diagram</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0-1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">grid</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;exponential&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">grid</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;logistic&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">grid</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;hinge&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/6459bb733ce0bba6c72fd1be50467810dc2a5eaa479e2adf7c2f5133b7cb5d5e.png" src="../_images/6459bb733ce0bba6c72fd1be50467810dc2a5eaa479e2adf7c2f5133b7cb5d5e.png" />
+</div>
+</div>
+</section>
+<section id="sigmoid-vs-logistic-loss">
+<h3>Sigmoid vs. logistic loss<a class="headerlink" href="#sigmoid-vs-logistic-loss" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>A common source of confusion:</p>
+<ul>
+<li><p>Sigmoid: <span class="math notranslate nohighlight">\(\frac{1}{(1+\exp(-z))}\)</span></p></li>
+<li><p>logistic loss: <span class="math notranslate nohighlight">\(\log(1+\exp(-z))\)</span></p></li>
+</ul>
+</li>
+<li><p>They look very similar and both are used in logistic regression.</p></li>
+<li><p>They have very different purposes.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+<span class="n">raw_model_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="s2">&quot;--k&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="s2">&quot;--k&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;raw model output, $w^Tx$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;predicted probability&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;the sigmoid function&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/dbf8fc8520c93ddb0b5615118a2d5533effdcaad4a5495688ee6dafb170c0866.png" src="../_images/dbf8fc8520c93ddb0b5615118a2d5533effdcaad4a5495688ee6dafb170c0866.png" />
+</div>
+</div>
+</section>
+<section id="id1">
+<h3>Sigmoid vs. logistic loss<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Sigmoid function: $<span class="math notranslate nohighlight">\(\frac{1}{(1+\exp(-z))}\)</span>$</p>
+<ul>
+<li><p>Maps <span class="math notranslate nohighlight">\(w^Tx_i\)</span> to a number in <span class="math notranslate nohighlight">\([0,1]\)</span>, to be interpreted as a probability.</p></li>
+<li><p>This is important in <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Logistic loss: <span class="math notranslate nohighlight">\(\log(1+\exp(-z))\)</span></p>
+<ul>
+<li><p>Maps <span class="math notranslate nohighlight">\(y_iw^Tx_i\)</span> to a positive number, which is the loss contribution from one training example.</p></li>
+<li><p>This is important in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="optional-another-source-of-confusion">
+<h3>(Optional) Another source of confusion<a class="headerlink" href="#optional-another-source-of-confusion" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>You might see this alternative formulation for logistic loss.</p></li>
+<li><p>For example see <a class="reference external" href="https://developers.google.com/machine-learning/crash-course/logistic-regression/model-training">here</a> or <a class="reference external" href="https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html">here</a>.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \sum_{x,y \in D} -y log(\hat{y}) - (1-y)log(1-\hat{y})\]</div>
+<ul class="simple">
+<li><p>Although this looks very different than the loss function we saw before, they produce the same loss.</p></li>
+<li><p>This is also referred to as cross-entropy loss.</p></li>
+<li><p>Logistic loss = cross-entropy loss</p></li>
+</ul>
+</section>
+<section id="optional-the-key-difference-between-them">
+<h3>(Optional) The key difference between them<a class="headerlink" href="#optional-the-key-difference-between-them" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>This formulation assumes the classes to be 0 and 1.
+$<span class="math notranslate nohighlight">\(f(w) = \sum_{x,y \in D} -y log(\hat{y}) - (1-y)log(1-\hat{y})\)</span>$</p></li>
+<li><p>Our previous formulation assumes classes to be -1 and +1.
+$<span class="math notranslate nohighlight">\(f(w)=\sum_{i=1}^n\log\left(1+\exp(-y_iw^Tx_i)\right)\)</span>$</p></li>
+</ul>
+</section>
+<section id="which-loss-function-should-i-use">
+<h3>Which loss function should I use?<a class="headerlink" href="#which-loss-function-should-i-use" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>This part is more of an art than science.</p></li>
+<li><p>What kind of penalty I want to put on the examples which are far away from the truth?</p></li>
+<li><p>Many other loss functions available out there</p></li>
+<li><p>ML researchers come up with their own loss functions based on their needs.</p></li>
+</ul>
+</section>
+<section id="break-5-mins">
+<h3>Break (~5 mins)<a class="headerlink" href="#break-5-mins" title="Permalink to this heading">#</a></h3>
+<p><img alt="" src="../_images/eva-coffee.png" /></p>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="regularization-motivation-and-notation">
+<h2>Regularization: Motivation and notation<a class="headerlink" href="#regularization-motivation-and-notation" title="Permalink to this heading">#</a></h2>
+<section id="complex-models-and-the-fundamental-tradeoff">
+<h3>Complex models and the fundamental tradeoff<a class="headerlink" href="#complex-models-and-the-fundamental-tradeoff" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We’ve said that complex models tend to overfit more.</p></li>
+<li><p>Recall: polynomial degree and train vs. validation scores.</p></li>
+</ul>
+<p>Let’s generate some synthetic data</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">X_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">y_valid</span> <span class="o">=</span> <span class="n">X_valid</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>
+
+<span class="c1"># transforming the data to include another axis</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+<span class="n">X_valid</span> <span class="o">=</span> <span class="n">X_valid</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="n">y_valid</span> <span class="o">=</span> <span class="n">y_valid</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+<span class="c1"># plt.scatter(X_train, y_train, color=&quot;blue&quot;)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8c8bce1b2847efe2027134d38d8d0aa25a48bd608f3eb63094e03dfa861cf99a.png" src="../_images/8c8bce1b2847efe2027134d38d8d0aa25a48bd608f3eb63094e03dfa861cf99a.png" />
+</div>
+</div>
+<p>Let’s fit polynomials of different degrees on the synthetic data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
+<span class="kn">from</span> <span class="nn">panel</span> <span class="kn">import</span> <span class="n">widgets</span>
+<span class="kn">from</span> <span class="nn">panel.interact</span> <span class="kn">import</span> <span class="n">interact</span>
+
+<span class="n">pn</span><span class="o">.</span><span class="n">extension</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">plot_poly_deg</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+<span class="n">interact</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/javascript">(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  var force = true;
+
+  if (typeof root._bokeh_onload_callbacks === "undefined" || force === true) {
+    root._bokeh_onload_callbacks = [];
+    root._bokeh_is_loading = undefined;
+  }
+
+  if (typeof (root._bokeh_timeout) === "undefined" || force === true) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) {
+        if (callback != null)
+          callback();
+      });
+    } finally {
+      delete root._bokeh_onload_callbacks
+    }
+    console.debug("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(css_urls, js_urls, js_modules, callback) {
+    if (css_urls == null) css_urls = [];
+    if (js_urls == null) js_urls = [];
+    if (js_modules == null) js_modules = [];
+
+    root._bokeh_onload_callbacks.push(callback);
+    if (root._bokeh_is_loading > 0) {
+      console.debug("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    }
+    if (js_urls.length === 0 && js_modules.length === 0) {
+      run_callbacks();
+      return null;
+    }
+    console.debug("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+
+    function on_load() {
+      root._bokeh_is_loading--;
+      if (root._bokeh_is_loading === 0) {
+        console.debug("Bokeh: all BokehJS libraries/stylesheets loaded");
+        run_callbacks()
+      }
+    }
+
+    function on_error() {
+      console.error("failed to load " + url);
+    }
+
+    for (var i = 0; i < css_urls.length; i++) {
+      var url = css_urls[i];
+      const element = document.createElement("link");
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.rel = "stylesheet";
+      element.type = "text/css";
+      element.href = url;
+      console.debug("Bokeh: injecting link tag for BokehJS stylesheet: ", url);
+      document.body.appendChild(element);
+    }
+
+    var skip = [];
+    if (window.requirejs) {
+      window.requirejs.config({'packages': {}, 'paths': {'gridstack': 'https://cdn.jsdelivr.net/npm/gridstack@4.2.5/dist/gridstack-h5', 'notyf': 'https://cdn.jsdelivr.net/npm/notyf@3/notyf.min'}, 'shim': {'gridstack': {'exports': 'GridStack'}}});
+      require(["gridstack"], function(GridStack) {
+	window.GridStack = GridStack
+	on_load()
+      })
+      require(["notyf"], function() {
+	on_load()
+      })
+      root._bokeh_is_loading = css_urls.length + 2;
+    } else {
+      root._bokeh_is_loading = css_urls.length + js_urls.length + js_modules.length;
+    }    if (((window['GridStack'] !== undefined) && (!(window['GridStack'] instanceof HTMLElement))) || window.requirejs) {
+      var urls = ['https://cdn.holoviz.org/panel/0.14.1/dist/bundled/gridstack/gridstack@4.2.5/dist/gridstack-h5.js'];
+      for (var i = 0; i < urls.length; i++) {
+        skip.push(urls[i])
+      }
+    }    if (((window['Notyf'] !== undefined) && (!(window['Notyf'] instanceof HTMLElement))) || window.requirejs) {
+      var urls = ['https://cdn.holoviz.org/panel/0.14.1/dist/bundled/notificationarea/notyf@3/notyf.min.js'];
+      for (var i = 0; i < urls.length; i++) {
+        skip.push(urls[i])
+      }
+    }    for (var i = 0; i < js_urls.length; i++) {
+      var url = js_urls[i];
+      if (skip.indexOf(url) >= 0) {
+	if (!window.requirejs) {
+	  on_load();
+	}
+	continue;
+      }
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (var i = 0; i < js_modules.length; i++) {
+      var url = js_modules[i];
+      if (skip.indexOf(url) >= 0) {
+	if (!window.requirejs) {
+	  on_load();
+	}
+	continue;
+      }
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    if (!js_urls.length && !js_modules.length) {
+      on_load()
+    }
+  };
+
+  function inject_raw_css(css) {
+    const element = document.createElement("style");
+    element.appendChild(document.createTextNode(css));
+    document.body.appendChild(element);
+  }
+
+  var js_urls = ["https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-gl-2.4.3.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.3.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.3.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-mathjax-2.4.3.min.js", "https://unpkg.com/@holoviz/panel@0.14.1/dist/panel.min.js"];
+  var js_modules = [];
+  var css_urls = ["https://cdn.holoviz.org/panel/0.14.1/dist/css/debugger.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/alerts.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/card.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/widgets.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/markdown.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/json.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/loading.css", "https://cdn.holoviz.org/panel/0.14.1/dist/css/dataframe.css"];
+  var inline_js = [    function(Bokeh) {
+      inject_raw_css("\n    .bk.pn-loading.arc:before {\n      background-image: url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJtYXJnaW46IGF1dG87IGJhY2tncm91bmQ6IG5vbmU7IGRpc3BsYXk6IGJsb2NrOyBzaGFwZS1yZW5kZXJpbmc6IGF1dG87IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiPiAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzNjM2MzIiBzdHJva2Utd2lkdGg9IjEwIiByPSIzNSIgc3Ryb2tlLWRhc2hhcnJheT0iMTY0LjkzMzYxNDMxMzQ2NDE1IDU2Ljk3Nzg3MTQzNzgyMTM4Ij4gICAgPGFuaW1hdGVUcmFuc2Zvcm0gYXR0cmlidXRlTmFtZT0idHJhbnNmb3JtIiB0eXBlPSJyb3RhdGUiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiBkdXI9IjFzIiB2YWx1ZXM9IjAgNTAgNTA7MzYwIDUwIDUwIiBrZXlUaW1lcz0iMDsxIj48L2FuaW1hdGVUcmFuc2Zvcm0+ICA8L2NpcmNsZT48L3N2Zz4=\");\n      background-size: auto calc(min(50%, 400px));\n    }\n    ");
+    },    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+function(Bokeh) {} // ensure no trailing comma for IE
+  ];
+
+  function run_inline_js() {
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (var i = 0; i < inline_js.length; i++) {
+        inline_js[i].call(root, root.Bokeh);
+      }} else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    }
+  }
+
+  if (root._bokeh_is_loading === 0) {
+    console.debug("Bokeh: BokehJS loaded, going straight to plotting");
+    run_inline_js();
+  } else {
+    load_libs(css_urls, js_urls, js_modules, function() {
+      console.debug("Bokeh: BokehJS plotting callback run at", now());
+      run_inline_js();
+    });
+  }
+}(window));</script><script type="application/javascript">
+if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {
+  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}
+}
+
+
+    function JupyterCommManager() {
+    }
+
+    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {
+      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        comm_manager.register_target(comm_id, function(comm) {
+          comm.on_msg(msg_handler);
+        });
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {
+          comm.onMsg = msg_handler;
+        });
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {
+          var messages = comm.messages[Symbol.asyncIterator]();
+          function processIteratorResult(result) {
+            var message = result.value;
+            console.log(message)
+            var content = {data: message.data, comm_id};
+            var buffers = []
+            for (var buffer of message.buffers || []) {
+              buffers.push(new DataView(buffer))
+            }
+            var metadata = message.metadata || {};
+            var msg = {content, buffers, metadata}
+            msg_handler(msg);
+            return messages.next().then(processIteratorResult);
+          }
+          return messages.next().then(processIteratorResult);
+        })
+      }
+    }
+
+    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {
+      if (comm_id in window.PyViz.comms) {
+        return window.PyViz.comms[comm_id];
+      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);
+        if (msg_handler) {
+          comm.on_msg(msg_handler);
+        }
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);
+        comm.open();
+        if (msg_handler) {
+          comm.onMsg = msg_handler;
+        }
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        var comm_promise = google.colab.kernel.comms.open(comm_id)
+        comm_promise.then((comm) => {
+          window.PyViz.comms[comm_id] = comm;
+          if (msg_handler) {
+            var messages = comm.messages[Symbol.asyncIterator]();
+            function processIteratorResult(result) {
+              var message = result.value;
+              var content = {data: message.data};
+              var metadata = message.metadata || {comm_id};
+              var msg = {content, metadata}
+              msg_handler(msg);
+              return messages.next().then(processIteratorResult);
+            }
+            return messages.next().then(processIteratorResult);
+          }
+        }) 
+        var sendClosure = (data, metadata, buffers, disposeOnDone) => {
+          return comm_promise.then((comm) => {
+            comm.send(data, metadata, buffers, disposeOnDone);
+          });
+        };
+        var comm = {
+          send: sendClosure
+        };
+      }
+      window.PyViz.comms[comm_id] = comm;
+      return comm;
+    }
+    window.PyViz.comm_manager = new JupyterCommManager();
+    
+
+
+var JS_MIME_TYPE = 'application/javascript';
+var HTML_MIME_TYPE = 'text/html';
+var EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';
+var CLASS_NAME = 'output';
+
+/**
+ * Render data to the DOM node
+ */
+function render(props, node) {
+  var div = document.createElement("div");
+  var script = document.createElement("script");
+  node.appendChild(div);
+  node.appendChild(script);
+}
+
+/**
+ * Handle when a new output is added
+ */
+function handle_add_output(event, handle) {
+  var output_area = handle.output_area;
+  var output = handle.output;
+  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+    return
+  }
+  var id = output.metadata[EXEC_MIME_TYPE]["id"];
+  var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+  if (id !== undefined) {
+    var nchildren = toinsert.length;
+    var html_node = toinsert[nchildren-1].children[0];
+    html_node.innerHTML = output.data[HTML_MIME_TYPE];
+    var scripts = [];
+    var nodelist = html_node.querySelectorAll("script");
+    for (var i in nodelist) {
+      if (nodelist.hasOwnProperty(i)) {
+        scripts.push(nodelist[i])
+      }
+    }
+
+    scripts.forEach( function (oldScript) {
+      var newScript = document.createElement("script");
+      var attrs = [];
+      var nodemap = oldScript.attributes;
+      for (var j in nodemap) {
+        if (nodemap.hasOwnProperty(j)) {
+          attrs.push(nodemap[j])
+        }
+      }
+      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });
+      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+    if (JS_MIME_TYPE in output.data) {
+      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];
+    }
+    output_area._hv_plot_id = id;
+    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {
+      window.PyViz.plot_index[id] = Bokeh.index[id];
+    } else {
+      window.PyViz.plot_index[id] = null;
+    }
+  } else if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+    var bk_div = document.createElement("div");
+    bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+    var script_attrs = bk_div.children[0].attributes;
+    for (var i = 0; i < script_attrs.length; i++) {
+      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);
+    }
+    // store reference to server id on output_area
+    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+  }
+}
+
+/**
+ * Handle when an output is cleared or removed
+ */
+function handle_clear_output(event, handle) {
+  var id = handle.cell.output_area._hv_plot_id;
+  var server_id = handle.cell.output_area._bokeh_server_id;
+  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }
+  var comm = window.PyViz.comm_manager.get_client_comm("hv-extension-comm", "hv-extension-comm", function () {});
+  if (server_id !== null) {
+    comm.send({event_type: 'server_delete', 'id': server_id});
+    return;
+  } else if (comm !== null) {
+    comm.send({event_type: 'delete', 'id': id});
+  }
+  delete PyViz.plot_index[id];
+  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {
+    var doc = window.Bokeh.index[id].model.document
+    doc.clear();
+    const i = window.Bokeh.documents.indexOf(doc);
+    if (i > -1) {
+      window.Bokeh.documents.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * Handle kernel restart event
+ */
+function handle_kernel_cleanup(event, handle) {
+  delete PyViz.comms["hv-extension-comm"];
+  window.PyViz.plot_index = {}
+}
+
+/**
+ * Handle update_display_data messages
+ */
+function handle_update_output(event, handle) {
+  handle_clear_output(event, {cell: {output_area: handle.output_area}})
+  handle_add_output(event, handle)
+}
+
+function register_renderer(events, OutputArea) {
+  function append_mime(data, metadata, element) {
+    // create a DOM node to render to
+    var toinsert = this.create_output_subarea(
+    metadata,
+    CLASS_NAME,
+    EXEC_MIME_TYPE
+    );
+    this.keyboard_manager.register_events(toinsert);
+    // Render to node
+    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+    render(props, toinsert[0]);
+    element.append(toinsert);
+    return toinsert
+  }
+
+  events.on('output_added.OutputArea', handle_add_output);
+  events.on('output_updated.OutputArea', handle_update_output);
+  events.on('clear_output.CodeCell', handle_clear_output);
+  events.on('delete.Cell', handle_clear_output);
+  events.on('kernel_ready.Kernel', handle_kernel_cleanup);
+
+  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+    safe: true,
+    index: 0
+  });
+}
+
+if (window.Jupyter !== undefined) {
+  try {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  } catch(err) {
+  }
+}
+</script><div class="output text_html"><style>.bk-root, .bk-root .bk:before, .bk-root .bk:after {
+  font-family: var(--jp-ui-font-size1);
+  font-size: var(--jp-ui-font-size1);
+  color: var(--jp-ui-font-color1);
+}
+</style></div><div class="output text_html"><div id='1002'>
+  <div class="bk-root" id="f47f8f5c-6da2-47ad-b821-a55327e4e9d8" data-root-id="1002"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  function embed_document(root) {
+    var docs_json = {"5fdae9dd-ba8b-49eb-a639-057dda7a5c4f":{"defs":[{"extends":null,"module":null,"name":"ReactiveHTML1","overrides":[],"properties":[]},{"extends":null,"module":null,"name":"FlexBox1","overrides":[],"properties":[{"default":"flex-start","kind":null,"name":"align_content"},{"default":"flex-start","kind":null,"name":"align_items"},{"default":"row","kind":null,"name":"flex_direction"},{"default":"wrap","kind":null,"name":"flex_wrap"},{"default":"flex-start","kind":null,"name":"justify_content"}]},{"extends":null,"module":null,"name":"GridStack1","overrides":[],"properties":[{"default":"warn","kind":null,"name":"mode"},{"default":null,"kind":null,"name":"ncols"},{"default":null,"kind":null,"name":"nrows"},{"default":true,"kind":null,"name":"allow_resize"},{"default":true,"kind":null,"name":"allow_drag"},{"default":[],"kind":null,"name":"state"}]},{"extends":null,"module":null,"name":"click1","overrides":[],"properties":[{"default":"","kind":null,"name":"terminal_output"},{"default":"","kind":null,"name":"debug_name"},{"default":0,"kind":null,"name":"clears"}]},{"extends":null,"module":null,"name":"NotificationAreaBase1","overrides":[],"properties":[{"default":"bottom-right","kind":null,"name":"position"},{"default":0,"kind":null,"name":"_clear"}]},{"extends":null,"module":null,"name":"NotificationArea1","overrides":[],"properties":[{"default":[],"kind":null,"name":"notifications"},{"default":"bottom-right","kind":null,"name":"position"},{"default":0,"kind":null,"name":"_clear"},{"default":[{"background":"#ffc107","icon":{"className":"fas fa-exclamation-triangle","color":"white","tagName":"i"},"type":"warning"},{"background":"#007bff","icon":{"className":"fas fa-info-circle","color":"white","tagName":"i"},"type":"info"}],"kind":null,"name":"types"}]},{"extends":null,"module":null,"name":"Notification","overrides":[],"properties":[{"default":null,"kind":null,"name":"background"},{"default":3000,"kind":null,"name":"duration"},{"default":null,"kind":null,"name":"icon"},{"default":"","kind":null,"name":"message"},{"default":null,"kind":null,"name":"notification_type"},{"default":false,"kind":null,"name":"_destroyed"}]},{"extends":null,"module":null,"name":"TemplateActions1","overrides":[],"properties":[{"default":0,"kind":null,"name":"open_modal"},{"default":0,"kind":null,"name":"close_modal"}]},{"extends":null,"module":null,"name":"MaterialTemplateActions1","overrides":[],"properties":[{"default":0,"kind":null,"name":"open_modal"},{"default":0,"kind":null,"name":"close_modal"}]}],"roots":{"references":[{"attributes":{"children":[{"id":"1006"}],"margin":[0,0,0,0],"name":"Row00107"},"id":"1005","type":"Row"},{"attributes":{"margin":[5,5,5,5],"name":"interactive00102","text":"&lt;pre&gt; &lt;/pre&gt;"},"id":"1006","type":"panel.models.markup.HTML"},{"attributes":{"children":[{"id":"1004"}],"margin":[0,0,0,0],"name":"Column00108"},"id":"1003","type":"Column"},{"attributes":{"client_comm_id":"d262f23c1009432196c97b4b1881408f","comm_id":"560c0e6614da48b09ce9dacf8b36d48b","plot_id":"1002"},"id":"1007","type":"panel.models.comm_manager.CommManager"},{"attributes":{"children":[{"id":"1003"},{"id":"1005"}],"margin":[0,0,0,0],"name":"Column00103"},"id":"1002","type":"Column"},{"attributes":{"reload":false},"id":"1008","type":"panel.models.location.Location"},{"attributes":{"end":20,"margin":[5,10,5,10],"start":1,"value":1},"id":"1004","type":"Slider"}],"root_ids":["1002","1007","1008"]},"title":"Bokeh Application","version":"2.4.3"}};
+    var render_items = [{"docid":"5fdae9dd-ba8b-49eb-a639-057dda7a5c4f","root_ids":["1002"],"roots":{"1002":"f47f8f5c-6da2-47ad-b821-a55327e4e9d8"}}];
+    root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && (id_el.children[0].className === 'bk-root')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	}
+      }
+    }
+  }
+  if (root.Bokeh !== undefined && root.Bokeh.Panel !== undefined) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (root.Bokeh !== undefined && root.Bokeh.Panel !== undefined) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div><img alt="../_images/d1eb53f2b20d0d5cb7604aa277745ada399ce8a7fac86a486ad0904c236ddc5f.png" src="../_images/d1eb53f2b20d0d5cb7604aa277745ada399ce8a7fac86a486ad0904c236ddc5f.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>The training score goes up as we increase the degree of the polynomial, and is highest for <span class="math notranslate nohighlight">\(p = 19\)</span>.</p></li>
+<li><p>The validation score first goes up and then down.</p></li>
+<li><p>The validation score is highest for <span class="math notranslate nohighlight">\(p = 3\)</span>, and it goes down as we increase the degree after that; we start overfitting after <span class="math notranslate nohighlight">\(p=3\)</span>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_train_valid_poly_deg</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/42d899f2831b39d3c9179c7450c2172aa8ae1082390d0807439b8d439cf92458.png" src="../_images/42d899f2831b39d3c9179c7450c2172aa8ae1082390d0807439b8d439cf92458.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>So there is a tradeoff between complexity of models and the validation score.</p></li>
+<li><p>But what if we need complex models?</p></li>
+<li><p>In supervised ML we try to find the mapping between <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, and usually the “true” mapping from <span class="math notranslate nohighlight">\(X\)</span> to <span class="math notranslate nohighlight">\(y\)</span> is complex.</p>
+<ul>
+<li><p>Might need high-degree polynomial.</p></li>
+<li><p>Might need to use many features, and don’t know “relevant” ones.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="controlling-model-complexity">
+<h3>Controlling model complexity<a class="headerlink" href="#controlling-model-complexity" title="Permalink to this heading">#</a></h3>
+<p>A few methods to control complexity:</p>
+<ul class="simple">
+<li><p>Reduce the number of features (feature selection)</p></li>
+<li><p>Model averaging (coming up): average over multiple models to decrease variance (e.g., random forests)</p></li>
+</ul>
+<!-- ![](img/random-forest-train-valid.png)     -->
+<a class="reference internal image-reference" href="../_images/random-forest-train-valid.png"><img alt="../_images/random-forest-train-valid.png" src="../_images/random-forest-train-valid.png" style="width: 400px; height: 400px;" /></a>
+</section>
+<section id="regularization-intuition">
+<h3>Regularization intuition<a class="headerlink" href="#regularization-intuition" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Another popular method to control model complexity is by adding a penalty on the complexity of the model</p>
+<ul>
+<li><p>Instead of minimizing just the Loss, we will minimize Loss + <span class="math notranslate nohighlight">\(\lambda \)</span> Model complexity</p></li>
+<li><p>Loss term measures how well the model fits the data.</p></li>
+<li><p>Model complexity term, which is also referred to as <strong>regularization term</strong>, measures model complexity.</p></li>
+<li><p>A scalar <span class="math notranslate nohighlight">\(\lambda\)</span> decides the overall impact of the regularization term.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="how-to-quantify-model-complexity">
+<h3>How to quantify model complexity?<a class="headerlink" href="#how-to-quantify-model-complexity" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Total number of features with non-zero weights</p>
+<ul>
+<li><p>L0 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert\)</span>, L0 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+</ul>
+</li>
+<li><p>As a function of weights: A feature weight with high absolute value is more complex than the feature weight with low absolute value.</p>
+<ul>
+<li><p>L2 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert_2^2\)</span>, square of the L2 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+<li><p>L1 regularization: quantify model complexity as <span class="math notranslate nohighlight">\(\lVert w \rVert_1\)</span>, L1 norm of <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+<p><br><br></p>
+</section>
+<section id="terminology-and-notation">
+<h3>Terminology and notation<a class="headerlink" href="#terminology-and-notation" title="Permalink to this heading">#</a></h3>
+<section id="reminder-l0-l1-and-l2-norms">
+<h4>Reminder: L0, L1, and L2 norms<a class="headerlink" href="#reminder-l0-l1-and-l2-norms" title="Permalink to this heading">#</a></h4>
+<p>Given a vector <span class="math notranslate nohighlight">\(w\)</span>,</p>
+<ul class="simple">
+<li><p>L0 norm <span class="math notranslate nohighlight">\(\lVert w \rVert \rightarrow\)</span> the number of non-zero elements in <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><p>L1 norm <span class="math notranslate nohighlight">\(\lVert w \rVert_1 = \lvert w_1 \rvert + \lvert w_2 \rvert + \dots + \lvert w_n \rvert\)</span></p></li>
+<li><p>L2 norm <span class="math notranslate nohighlight">\(\lVert w \rVert_2 = (w_1^2 + w_2^2 + \dots + w_n^2)^{1/2}\)</span></p></li>
+<li><p>Square of the L2 norm <span class="math notranslate nohighlight">\(\lVert w \rVert_2^2 = (w_1^2 + w_2^2 + \dots + w_n^2)\)</span></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+
+<span class="n">l0</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># number of non-zero values</span>
+<span class="n">l1</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># sum of absolute values</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># square root of sum of the squared values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l0 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">l0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l1 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">l1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l2 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">l2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The l0 norm of [ 0 -2  4] is: 2.000
+The l1 norm of [ 0 -2  4] is: 6.000
+The l2 norm of [ 0 -2  4] is: 4.472
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># norms of a vector</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="c1"># l0 norm is the number of non-zero values in a vector</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l0 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+
+<span class="c1"># l1 norm is the sum of the absolute values in a vector.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l1 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+
+<span class="c1"># l2 norm is square root of the sum of the squared values in a vector.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The l2 norm of </span><span class="si">%s</span><span class="s2"> is: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The l0 norm of [ 0 -2  3  0] is: 2.000
+The l1 norm of [ 0 -2  3  0] is: 5.000
+The l2 norm of [ 0 -2  3  0] is: 3.606
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>We can write least squares using this notation.</p></li>
+<li><p>It’s the square of the L2 norm of the difference between predicted y’s and true y’s.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[ f(w) = \sum_{i=1}^{n}{(w^Tx_i - y_i)^2}\]</div>
+<div class="math notranslate nohighlight">
+\[ f(w) = \lVert{Xw -y}\rVert_2^2\]</div>
+</section>
+</section>
+<section id="optional-vectorization">
+<h3>(Optional) Vectorization<a class="headerlink" href="#optional-vectorization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We can organize all the training examples into a matrix <span class="math notranslate nohighlight">\(Z\)</span> with one row per training example.</p></li>
+<li><p>Then compute the predictions for the whole dataset succinctly as <span class="math notranslate nohighlight">\(Zw\)</span> for the whole dataset:</p></li>
+<li><p>We take each row of <span class="math notranslate nohighlight">\(Z\)</span> and dot-product it with <span class="math notranslate nohighlight">\(w\)</span>. So the result is a vector of all our predictions.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}Zw = \begin{bmatrix}w^Tz_0 \\ w^Tz_1 \\ \vdots \\ w^Tz_n\end{bmatrix} = \begin{bmatrix}z_0w \\ z_1w \\ \vdots \\ z_nw\end{bmatrix} = \begin{bmatrix} \hat{y_1} \\ \hat{y_2} \\ \vdots \\ \hat{y_n}\end{bmatrix} \end{split}\]</div>
+<ul class="simple">
+<li><p>Sometimes, we refer to the transformed data (e.g., after applying polynomial transformations) as <span class="math notranslate nohighlight">\(Z\)</span> (instead of <span class="math notranslate nohighlight">\(X\)</span>) and the weights associated with the transformed features as <span class="math notranslate nohighlight">\(v\)</span> (instead of <span class="math notranslate nohighlight">\(w\)</span>).</p></li>
+<li><p>So the least square loss function after applying polynomial transformations can be written as:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert{Zv -y}\rVert_2^2\]</div>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="complexity-penalties-and-l0-regularization">
+<h2>Complexity penalties and L0 regularization<a class="headerlink" href="#complexity-penalties-and-l0-regularization" title="Permalink to this heading">#</a></h2>
+<section id="model-selection-complexity-penalty">
+<h3>Model selection: complexity penalty<a class="headerlink" href="#model-selection-complexity-penalty" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We want our model to fit the data well but we do not want an overly complex model.</p></li>
+<li><p>How about penalizing complex models?</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_poly_degrees</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span> <span class="c1"># user-defined function in plotting_functions.py</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/53f18e97617715d3f4c611c46867fbfbe4208daf71849649ae887a94186de02b.png" src="../_images/53f18e97617715d3f4c611c46867fbfbe4208daf71849649ae887a94186de02b.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>For example, here we are getting more or less the same scores with <span class="math notranslate nohighlight">\(p=3\)</span> and <span class="math notranslate nohighlight">\(p=4\)</span>.</p></li>
+<li><p>How about penalizing complex models a bit so that in such situation we would pick a simpler model?</p></li>
+</ul>
+</section>
+<section id="complexity-penalty">
+<h3>Complexity penalty<a class="headerlink" href="#complexity-penalty" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Measure complexity in terms of the number of degrees of freedom or parameters in the model</p></li>
+<li><p>In case polynomial features, minimize the training error + the degree of
+polynomial.</p></li>
+<li><p>Find <span class="math notranslate nohighlight">\(p\)</span> that minimizes</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[ score(p) = \lVert{Z_pv -y}\rVert^2 + p\]</div>
+<ul class="simple">
+<li><p>where</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(p \rightarrow\)</span> degree of polynomial in polynomial transformations</p></li>
+<li><p><span class="math notranslate nohighlight">\(Z_p \rightarrow\)</span> transformed polynomial features</p></li>
+<li><p><span class="math notranslate nohighlight">\(v \rightarrow\)</span> weights associated with <span class="math notranslate nohighlight">\(Z_p\)</span></p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>If we use <span class="math notranslate nohighlight">\(p=3\)</span>, use loss + 3 as the total loss.</p></li>
+<li><p>If we use <span class="math notranslate nohighlight">\(p=4\)</span>, use loss + 4 as the total loss.</p></li>
+<li><p>If two <span class="math notranslate nohighlight">\(p\)</span> have similar losses, this prefers smaller <span class="math notranslate nohighlight">\(p\)</span>.</p></li>
+</ul>
+</section>
+<section id="optimizing-this-score">
+<h3>Optimizing this score<a class="headerlink" href="#optimizing-this-score" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[ score(p) = \lVert{Z_pv -y}\rVert_2^2 + p\]</div>
+<ul class="simple">
+<li><p>Form <span class="math notranslate nohighlight">\(Z_0\)</span>, solve for <span class="math notranslate nohighlight">\(v\)</span> compute <span class="math notranslate nohighlight">\( score(0) = \lVert{Z_0v -y}_2\rVert^2 + 0\)</span></p></li>
+<li><p>Form <span class="math notranslate nohighlight">\(Z_1\)</span>, solve for <span class="math notranslate nohighlight">\(v\)</span> compute <span class="math notranslate nohighlight">\( score(1) = \lVert{Z_1v -y}\rVert^2 + 1\)</span></p></li>
+<li><p>Form <span class="math notranslate nohighlight">\(Z_2\)</span>, solve for <span class="math notranslate nohighlight">\(v\)</span> compute <span class="math notranslate nohighlight">\( score(2) = \lVert{Z_2v -y}\rVert^2 + 2\)</span></p></li>
+<li><p>Form <span class="math notranslate nohighlight">\(Z_3\)</span>, solve for <span class="math notranslate nohighlight">\(v\)</span> compute <span class="math notranslate nohighlight">\( score(3) = \lVert{Z_3v -y}\rVert^2 + 3\)</span></p></li>
+</ul>
+<p>Choose the degree with the lowest score.</p>
+<ul class="simple">
+<li><p>We need to decrease the training error by at least 1 to increase degree by 1.</p></li>
+</ul>
+</section>
+<section id="optional-model-selection">
+<h3>(Optional) Model selection<a class="headerlink" href="#optional-model-selection" title="Permalink to this heading">#</a></h3>
+<p>There are many scores usually with the form:
+$<span class="math notranslate nohighlight">\( score(p) = \frac{1}{2}\lVert{Z_pv -y}\rVert^2 + \lambda k\)</span>$</p>
+<p><span class="math notranslate nohighlight">\(k\rightarrow \text{estimated parameters/degrees of freedom}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\lambda \rightarrow \text{penalization factor}\)</span></p>
+<ul class="simple">
+<li><p>Pick the model with lowest score.</p></li>
+<li><p>The way we choose <span class="math notranslate nohighlight">\(\lambda\)</span> gives us different statistical measures for model selection.</p></li>
+<li><p>For example</p>
+<ul>
+<li><p>AIC sets <span class="math notranslate nohighlight">\(\lambda = 1\)</span> and penalizes the model complexity by the degree of freedom</p></li>
+<li><p>BIC sets <span class="math notranslate nohighlight">\(\lambda = log(N)\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of examples.</p></li>
+<li><p>MSE does not penalize the model</p></li>
+<li><p>Classification error does not penalize the model</p></li>
+</ul>
+</li>
+</ul>
+<p>More on these measures <a class="reference external" href="https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf">here</a>.
+You’ll learn more about this in DSCI 562.</p>
+</section>
+<section id="remember-the-search-and-score-methods-for-feature-selection">
+<h3>Remember the search and score methods for feature selection<a class="headerlink" href="#remember-the-search-and-score-methods-for-feature-selection" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Define a <strong>scoring function</strong> <span class="math notranslate nohighlight">\(f(S)\)</span> that measures the quality of the set of features <span class="math notranslate nohighlight">\(S\)</span>.</p></li>
+<li><p>Now <strong>search</strong> for the set of features <span class="math notranslate nohighlight">\(S\)</span> with the best score.</p></li>
+<li><p>Example: Suppose you have three features: <span class="math notranslate nohighlight">\(A, B, C\)</span></p>
+<ul>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{A\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S= \{B\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{C\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{A,B\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{A,C\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{B,C\}\)</span></p></li>
+<li><p>Compute <strong>score</strong> for <span class="math notranslate nohighlight">\(S = \{A,B,C\}\)</span></p></li>
+</ul>
+</li>
+<li><p>Return <span class="math notranslate nohighlight">\(S\)</span> with the best score.</p></li>
+</ul>
+</section>
+<section id="scoring-using-complexity-penalties">
+<h3>Scoring using complexity penalties<a class="headerlink" href="#scoring-using-complexity-penalties" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Find <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(W_s\)</span> minimizing the squared error + the number of selected features</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[ score(S) = \lVert{X_{S}w_S -y}\rVert_2^2 + size(S) \]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X_{S}\)</span> is features <span class="math notranslate nohighlight">\(S\)</span> of examples <span class="math notranslate nohighlight">\(X\)</span>.</p></li>
+<li><p>Example</p>
+<ul>
+<li><p>Suppose <span class="math notranslate nohighlight">\(S_1 = \{f_1, f_2, f_4\}\)</span> <span class="math notranslate nohighlight">\(S_2 = \{f_1, f_2, f_4, f_5\}\)</span> have similar error, it prefers <span class="math notranslate nohighlight">\(S_1\)</span>.</p></li>
+<li><p>It prefers removing <span class="math notranslate nohighlight">\(f_5\)</span> instead of keeping it with a small weight.</p></li>
+</ul>
+</li>
+<li><p>Instead of <span class="math notranslate nohighlight">\(size(S)\)</span>, we usually write “<span class="math notranslate nohighlight">\(L0\)</span> norm”.</p></li>
+</ul>
+</section>
+<section id="l0-norm-and-the-number-of-features-used">
+<h3><span class="math notranslate nohighlight">\(L0\)</span> “norm”  and the number of features used<a class="headerlink" href="#l0-norm-and-the-number-of-features-used" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>In linear models, setting <span class="math notranslate nohighlight">\(w_j = 0\)</span> is the same as removing the feature.</p></li>
+<li><p>Example: $<span class="math notranslate nohighlight">\(\hat{y_i} = w_1x_1 + w_2x_2 + w_3x_3 + w_4x_4\)</span>$</p></li>
+<li><p><span class="math notranslate nohighlight">\(L0\)</span> “norm” is the number of non-zero values.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(w = \begin{bmatrix}0.8 \\ 0.0 \\ 0.03 \\0.1\end{bmatrix}\)</span>, <span class="math notranslate nohighlight">\(\lVert w\rVert_0 = 3\)</span> and if <span class="math notranslate nohighlight">\(w = \begin{bmatrix}0.0 \\ 0.0 \\ 0.22 \\0.0\end{bmatrix}\)</span>, <span class="math notranslate nohighlight">\(\lVert w\rVert_0 = 1\)</span></p></li>
+</ul>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h3>
+<p>Imagine the following two weight vectors which give the same error.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix}100 \\0\end{bmatrix}  w^2 = \begin{bmatrix}99.98 \\0.03\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Which one would be chosen by L0 regularization?
+<br><br><br><br><br><br><br><br></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w^1\rVert_0 = 1\)</span> and <span class="math notranslate nohighlight">\(\lVert w^2\rVert_0 = 2\)</span>. So it will pick <span class="math notranslate nohighlight">\(w^1\)</span>.</p></li>
+</ul>
+</section>
+<section id="scoring-using-l0-norm">
+<h3>Scoring using <span class="math notranslate nohighlight">\(L0\)</span> “norm”<a class="headerlink" href="#scoring-using-l0-norm" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Most common “scores” have the form.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert{Xw -y}\rVert^2_2 + \lambda \lVert w\rVert_0\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lVert{Xw -y}\rVert^2_2 \rightarrow\)</span> square of the L2 norm <span class="math notranslate nohighlight">\(Xw -y\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda \rightarrow\)</span> penalty parameter</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w\rVert_0 \rightarrow\)</span>  L0 norm of <span class="math notranslate nohighlight">\(w\)</span></p>
+<ul>
+<li><p>The number of non-zero values in <span class="math notranslate nohighlight">\(w\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>To increase the degrees of freedom by one, need to decrease the error by <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
+<li><p>Prefer smaller degrees of freedom if errors are similar.</p></li>
+<li><p>Can’t optimize because the function is discontinuous in <span class="math notranslate nohighlight">\(\lVert w\rVert_0\)</span></p>
+<ul>
+<li><p>Search over possible models</p></li>
+</ul>
+</li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="l2-regularization">
+<h2>L2 regularization<a class="headerlink" href="#l2-regularization" title="Permalink to this heading">#</a></h2>
+<section id="idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">
+<h3>Idea of regularization: Pick the line/hyperplane with smaller slope<a class="headerlink" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Assuming red and green models have the same training error and if you are forced to choose one of them, which one would you pick?</p>
+<ul>
+<li><p><strong>Pick the solid green line because its slope is smaller.</strong></p></li>
+<li><p>Small change in <span class="math notranslate nohighlight">\(x_i\)</span> has a smaller change in prediction <span class="math notranslate nohighlight">\(y_i\)</span></p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(w\)</span> is less sensitive to the training data, it’s likely to generalize better.<br />
+<img alt="" src="../_images/regularization.png" /></p></li>
+</ul>
+</li>
+</ul>
+<!-- <img src='img/green_or_red.png' width="600" height="600" /> -->
+<ul class="simple">
+<li><p>Standard regularization strategy is L2 regularization</p>
+<ul>
+<li><p>We incorporate L2 penalty in the loss function <span class="math notranslate nohighlight">\(f(w)\)</span>:
+$<span class="math notranslate nohighlight">\(f(w) = \sum_i^n(w^Tx_i - y_i)^2 + \lambda\sum_j^d w_j^2 \text{ or }\)</span><span class="math notranslate nohighlight">\( 
+\)</span><span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \lambda \lVert w\rVert_2^2\)</span>$</p></li>
+</ul>
+</li>
+<li><p><span class="math notranslate nohighlight">\(\lVert Xw - y\rVert_2^2 \rightarrow\)</span> square of the <span class="math notranslate nohighlight">\(L2\)</span> norm of <span class="math notranslate nohighlight">\(Xw -y\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda \rightarrow\)</span> regularization strength</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lVert w\rVert_2^2 \rightarrow\)</span>  square of the L2 norm of <span class="math notranslate nohighlight">\(w\)</span></p>
+<ul>
+<li><p>sum of the squared weight values.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h3>L2 regularization<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[f(w) = \lVert Xw - y\rVert_2^2 + \lambda\lVert w\rVert_2^2\]</div>
+<ul class="simple">
+<li><p>Objective balances getting low error vs. having small slopes <span class="math notranslate nohighlight">\(w_j\)</span></p></li>
+<li><p>In terms of fundamental trade-off:</p>
+<ul>
+<li><p>You can increase the training error.</p></li>
+<li><p>Nearly-always reduces overfitting and the validation error.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="regularization-demo">
+<h3>Regularization demo<a class="headerlink" href="#regularization-demo" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Let’s generate some synthetic data with N = 20 points.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.01</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">X</span> <span class="o">*</span> <span class="mi">5</span>
+
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;training data&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/1233711dc337f58a761035ae3bcdc19fcb93290de9b0df3a820b2e3676222ea6.png" src="../_images/1233711dc337f58a761035ae3bcdc19fcb93290de9b0df3a820b2e3676222ea6.png" />
+</div>
+</div>
+<p>Let’s fit with degree <span class="math notranslate nohighlight">\(N-1\)</span> polynomial</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pf</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">w_lr_19</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">grid_poly_19</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;training data&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid_poly_19</span> <span class="o">@</span> <span class="n">w_lr_19</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.0
+</pre></div>
+</div>
+<img alt="../_images/d72af0156c44b2dbef6ace861722ae8420f56e0c595ee82a0acb5ede740fce26.png" src="../_images/d72af0156c44b2dbef6ace861722ae8420f56e0c595ee82a0acb5ede740fce26.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Problem: this results are crazy (overfitting).</p></li>
+<li><p>Bigger values of weights means the model is very sensitive to the training data.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">w_lr_19</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">pf</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x0^15</th>
+      <td>-5.150150e+07</td>
+    </tr>
+    <tr>
+      <th>x0^16</th>
+      <td>-5.316861e+06</td>
+    </tr>
+    <tr>
+      <th>x0^17</th>
+      <td>3.466582e+07</td>
+    </tr>
+    <tr>
+      <th>x0^18</th>
+      <td>1.482311e+06</td>
+    </tr>
+    <tr>
+      <th>x0^19</th>
+      <td>-9.517721e+06</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">w_lr_19</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>51501499.24478904
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="solution-1-use-a-lower-degree-polynomial">
+<h3>Solution 1: Use a lower degree polynomial<a class="headerlink" href="#solution-1-use-a-lower-degree-polynomial" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pf</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">w_lr_2</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">grid_poly_2</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;training data&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid_poly_2</span> <span class="o">@</span> <span class="n">w_lr_2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">);</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8717193637247818
+</pre></div>
+</div>
+<img alt="../_images/4be9a0c9e12a1aa89feed4828a859fad460e3ea970901b26b547533c974899b0.png" src="../_images/4be9a0c9e12a1aa89feed4828a859fad460e3ea970901b26b547533c974899b0.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>The lower degree polynomial looks good.</p></li>
+<li><p>But if the true relationship really was complicated? Then if we restricted the degree of the polynomial, we’d miss out on it.</p></li>
+</ul>
+</section>
+<section id="solution-2-use-regularization">
+<h3>Solution 2: Use regularization<a class="headerlink" href="#solution-2-use-regularization" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The idea of regularization is to “regularize” weights so that they are small and so less sensitive to the data.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pf</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># Regularized linear regression</span>
+<span class="n">r</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">w_ridge_19</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">mglearn</span><span class="o">.</span><span class="n">discrete_scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;training data&quot;</span><span class="p">])</span>
+<span class="n">grid_poly_ridge</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid_poly_ridge</span> <span class="o">@</span> <span class="n">w_ridge_19</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">grid_poly_19</span> <span class="o">@</span> <span class="n">w_lr_19</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s1">&#39;ridge (deg=19)&#39;</span><span class="p">,</span> <span class="s1">&#39;linear regression (deg=19)&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">);</span>
+<span class="n">r</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.9135817441429818
+</pre></div>
+</div>
+<img alt="../_images/b84e75f94850e511aa6a5de685983ad944b328b930c9261d1943f7fcbf8769da.png" src="../_images/b84e75f94850e511aa6a5de685983ad944b328b930c9261d1943f7fcbf8769da.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">w_ridge_19</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">pf</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x0^15</th>
+      <td>0.780600</td>
+    </tr>
+    <tr>
+      <th>x0^16</th>
+      <td>1.170325</td>
+    </tr>
+    <tr>
+      <th>x0^17</th>
+      <td>2.655623</td>
+    </tr>
+    <tr>
+      <th>x0^18</th>
+      <td>1.800171</td>
+    </tr>
+    <tr>
+      <th>x0^19</th>
+      <td>4.240822</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">w_ridge_19</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8.010363113222288
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Regularization helped! Even though we used a degree <span class="math notranslate nohighlight">\(N-1\)</span> polynomial, we didn’t end up with a crazy model.</p></li>
+<li><p>We are keeping all the complex features but assigning small weights to higher degree polynomial.</p></li>
+<li><p>We can add regularization to many models, not just least squares with a polynomial basis.</p></li>
+</ul>
+</section>
+<section id="why-are-small-weights-better">
+<h3>Why are small weights better?<a class="headerlink" href="#why-are-small-weights-better" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Somewhat non-intuitive.</p></li>
+<li><p>Suppose <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span> are nearby each other.</p></li>
+<li><p>We might expect that they have similar <span class="math notranslate nohighlight">\(\hat{y}\)</span>.</p></li>
+<li><p>If we change feature1 value by a small amount <span class="math notranslate nohighlight">\(\epsilon\)</span> in <span class="math notranslate nohighlight">\(x_2\)</span>, leaving everything else the same, we might think that the prediction would be the same.</p></li>
+<li><p>But if we have bigger weights small change in <span class="math notranslate nohighlight">\(x_2\)</span> has a large effect on the prediction.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">x_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x_1 prediction: &quot;</span><span class="p">,</span> <span class="n">x_1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x_2 prediction: &quot;</span><span class="p">,</span> <span class="n">x_2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x_1 prediction:  104.32
+x_2 prediction:  84.32
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>In linear models, the rate of change of the prediction function is proportional to the individual weights.</p></li>
+<li><p>So if we want the function to change slowly, we want to ensure that the weights stay small.</p></li>
+<li><p>The idea is to avoid putting all our energy into one features, which might give us over-confident predictions and lead to overfitting.</p></li>
+</ul>
+</section>
+<section id="have-we-seen-l2-regularization-before">
+<h3>Have we seen L2 regularization before?<a class="headerlink" href="#have-we-seen-l2-regularization-before" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html">Ridge</a>: Linear Regression with L2 regularization</p></li>
+</ul>
+<blockquote>
+<div><p>class sklearn.linear_model.Ridge(alpha=1.0, fit_intercept=True, normalize=False, copy_X=True, max_iter=None, tol=0.001, solver=’auto’, random_state=None)</p>
+</div></blockquote>
+<blockquote>
+<div><p>Linear least squares with l2 regularization. Minimizes the objective function: ||y - Xw||^2_2 + alpha * ||w||^2_2
+This model solves a regression model where the loss function is the linear least squares function and regularization is given by the l2-norm. Also known as Ridge Regression or Tikhonov regularization.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Uses the hyperparameter <span class="math notranslate nohighlight">\(\alpha\)</span> for regularization strength instead of <span class="math notranslate nohighlight">\(\lambda\)</span>; larger value of <span class="math notranslate nohighlight">\(\alpha\)</span> means more regularization.
+$<span class="math notranslate nohighlight">\(f(w) = \lVert Xw - y\rVert_2^2 + \alpha \lVert w\rVert_2^2\)</span>$</p></li>
+</ul>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html">LogisticRegression</a>: Logistic Regression with L2 regularization</p></li>
+</ul>
+<blockquote>
+<div><p>class sklearn.linear_model.LogisticRegression(penalty=’l2’, *, dual=False, tol=0.0001, C=1.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None, solver=’lbfgs’, max_iter=100, multi_class=’auto’, verbose=0, warm_start=False, n_jobs=None, l1_ratio=None)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code>: default=1.0
+Inverse of regularization strength; must be a positive float. Like in support vector machines, smaller values specify stronger regularization.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="summary-what-did-we-learn-today">
+<h2>Summary: What did we learn today?<a class="headerlink" href="#summary-what-did-we-learn-today" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Loss functions (high level)</p>
+<ul>
+<li><p>OLS vs absolute loss</p></li>
+<li><p>0/1 loss</p></li>
+<li><p>Exponential loss</p></li>
+<li><p>Hinge loss</p></li>
+<li><p>Logistic loss</p></li>
+</ul>
+</li>
+<li><p>Adding complexity penalties to the loss function</p>
+<ul>
+<li><p>L0 penalty</p></li>
+<li><p>Introduction to L2 regularization</p></li>
+</ul>
+</li>
+<li><p>Coming up</p>
+<ul>
+<li><p>More on L2 regularization</p></li>
+<li><p>L1 regularization</p></li>
+</ul>
+</li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+<section id="questions-for-you">
+<h2>❓❓ Questions for you<a class="headerlink" href="#questions-for-you" title="Permalink to this heading">#</a></h2>
+<section id="exercise-5-1-l0-and-l2-regularization">
+<h3>Exercise 5.1 L0 and L2-regularization<a class="headerlink" href="#exercise-5-1-l0-and-l2-regularization" title="Permalink to this heading">#</a></h3>
+<p><strong>Select all the statements below which are True.</strong></p>
+<ul class="simple">
+<li><p>(A) In the equation below of L0-regularization, smaller value for <span class="math notranslate nohighlight">\(\lVert w\rVert_0\)</span> means we discard most of the features.
+$<span class="math notranslate nohighlight">\( f(w) = \lVert{Xw -y}\rVert^2 + \lambda \lVert w\rVert_0\)</span>$</p></li>
+<li><p>(B) In the above equation, larger <span class="math notranslate nohighlight">\(\lambda\)</span> means aggressively changing many weights to zero.</p></li>
+</ul>
+<p><strong>V’s answers: A, B,</strong></p>
+</section>
+<section id="exercise-5-2">
+<h3>Exercise 5.2<a class="headerlink" href="#exercise-5-2" title="Permalink to this heading">#</a></h3>
+<p>Imagine that you fit <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> twice with different values of <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\alpha = 0\)</span> and <span class="math notranslate nohighlight">\(\alpha=10\)</span>. You are given the weights learned from two different models below. Without knowing which weights came from which model, you can guess that <span class="math notranslate nohighlight">\(w^1\)</span> probably corresponds to <span class="math notranslate nohighlight">\(\alpha = 10\)</span> and <span class="math notranslate nohighlight">\(w^2\)</span> probably corresponds to <span class="math notranslate nohighlight">\(\alpha = 0\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}w^1 = \begin{bmatrix} 32.43\\23.14\\16.4\end{bmatrix} \text{ and }w^2 = \begin{bmatrix} 2.03\\1.2\\0.4\end{bmatrix}\end{split}\]</div>
+<p><strong>V’s answers: False. Bigger alpha means the weights should be smaller.</strong></p>
+<p><img alt="" src="../_images/eva-talksoon.png" /></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "571"
+        },
+        kernelOptions: {
+            name: "571",
+            path: "./lectures"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = '571'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="04_feat-importances-selection.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lecture 4: Feature importances and feature selection</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="06_L2-L1-regularization.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lecture 6: L2- and L1-Regularization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions-big-picture">Loss functions: big picture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-model">Choosing your model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-loss-function">Choosing your loss function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-your-optimization-algorithm">Choosing your optimization algorithm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-regression-loss-function">Linear regression loss function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinary-least-squares">Ordinary least squares</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-with-ols">Learning with OLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-value-loss">Absolute value loss</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions-in-classification-problems">Loss functions in classification problems</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-about-using-ols-for-binary-classification">How about using OLS for binary classification?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-should-be-the-loss-activity-4-mins">What should be the loss? (Activity: 4 mins)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-do-we-want">What do we want?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-idea">Key idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loss">0/1 loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preferences">Preferences</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponential-loss">Exponential loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition">Intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hinge-loss">Hinge Loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logistic-loss-logloss">Logistic loss (logloss)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sigmoid-vs-logistic-loss">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Sigmoid vs. logistic loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-another-source-of-confusion">(Optional) Another source of confusion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-the-key-difference-between-them">(Optional) The key difference between them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-loss-function-should-i-use">Which loss function should I use?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#break-5-mins">Break (~5 mins)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-motivation-and-notation">Regularization: Motivation and notation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-models-and-the-fundamental-tradeoff">Complex models and the fundamental tradeoff</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#controlling-model-complexity">Controlling model complexity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-intuition">Regularization intuition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-quantify-model-complexity">How to quantify model complexity?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology-and-notation">Terminology and notation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reminder-l0-l1-and-l2-norms">Reminder: L0, L1, and L2 norms</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-vectorization">(Optional) Vectorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity-penalties-and-l0-regularization">Complexity penalties and L0 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-selection-complexity-penalty">Model selection: complexity penalty</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity-penalty">Complexity penalty</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizing-this-score">Optimizing this score</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-model-selection">(Optional) Model selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#remember-the-search-and-score-methods-for-feature-selection">Remember the search and score methods for feature selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scoring-using-complexity-penalties">Scoring using complexity penalties</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l0-norm-and-the-number-of-features-used"><span class="math notranslate nohighlight">\(L0\)</span> “norm”  and the number of features used</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scoring-using-l0-norm">Scoring using <span class="math notranslate nohighlight">\(L0\)</span> “norm”</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#l2-regularization">L2 regularization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idea-of-regularization-pick-the-line-hyperplane-with-smaller-slope">Idea of regularization: Pick the line/hyperplane with smaller slope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">L2 regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization-demo">Regularization demo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-1-use-a-lower-degree-polynomial">Solution 1: Use a lower degree polynomial</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-2-use-regularization">Solution 2: Use regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-are-small-weights-better">Why are small weights better?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#have-we-seen-l2-regularization-before">Have we seen L2 regularization before?</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-what-did-we-learn-today">Summary: What did we learn today?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-1-l0-and-l2-regularization">Exercise 5.1 L0 and L2-regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-2">Exercise 5.2</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar and Joel Östblom
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
